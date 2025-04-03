@@ -59,6 +59,6 @@ def scrape_subreddit(subreddit_names: list[str], limit: int = 10) -> str:
 
 if __name__ == "__main__":
     subreddit_names = [
-        "conservative"
+        "antiwork"
     ]
     scrape_subreddit(subreddit_names, limit=300)

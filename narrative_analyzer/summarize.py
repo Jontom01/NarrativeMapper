@@ -1,10 +1,15 @@
-from keybert import KeyBERT
 import pandas as pd
 from transformers import pipeline
+import ast
+from dotenv import load_dotenv
+from openai import OpenAI
+import os 
 
+load_dotenv()
 
-kw_model = KeyBERT()
-sentiment_analyzer = pipeline("sentiment-analysis")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
 def analyze_sentiments_for_texts(texts):
     """
@@ -32,76 +37,116 @@ def analyze_sentiments_for_texts(texts):
         overall = "NEUTRAL"
     return overall, sentiments
 
-def extract_keywords_for_cluster(texts, top_n=10):
-    joined = " ".join(texts)
-    keywords = kw_model.extract_keywords(
-        joined,
-        keyphrase_ngram_range=(1, 3),
-        stop_words='english',
-        top_n=top_n
+def extract_keywords_for_cluster(texts):
+    prompt = f"""
+        Here are comments/messages from the same topic cluster (after using embeddings to vectorize the text-semantics and then a clustering algorithm to group them):
+        ---
+        {texts}
+        ---
+        Please summarize the core topic or themes of this cluster in 1 sentence (brief, no filler words).
+        """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.5
     )
-    result = []
-    for kw, _ in keywords:
-        result.append(kw)
-    return result
+    return str(response.choices[0].message.content)
 
 def summarize_clusters(df):
-    #firstly for keyword extraction
-    #sample texts in cluster
-    sampled_list = []
-    grouped_obj = df.groupby('cluster')
-    for cluster, group in grouped_obj:
-        sample_size = min(500, len(group))
-        sampled_group = group.sample(n=sample_size, random_state=42)
-        sampled_list.append(sampled_group)
-    sampled_df = pd.concat(sampled_list).reset_index(drop=True)
-
-    #group sample text by cluster
+    #group texts by cluster and sample up to 500 texts per cluster
     grouped_texts = {}
-    grouped_obj2 = sampled_df.groupby('cluster')
-    for cluster, group in grouped_obj2:
-        text_list = group['text'].tolist()
-        grouped_texts[cluster] = text_list
-    grouped_df = pd.DataFrame(list(grouped_texts.items()), columns=['cluster', 'text'])
+    grouped = df.groupby('cluster')
+    for cluster, group in grouped:
+        sample_size = min(500, len(group))
+        grouped_texts[cluster] = group['text'].sample(n=sample_size, random_state=42).tolist()
+    
 
-    #apply keyword extraction for each cluster
+    grouped_df = pd.DataFrame(list(grouped_texts.items()), columns=['cluster', 'text'])
+    
+    #use OpenAI Chat Completions to extract a concise summary (cluster label) for each cluster
     main_talking_points = []
     for texts in grouped_df['text']:
-        keywords = extract_keywords_for_cluster(texts, top_n=10)
-        main_talking_points.append(keywords)
+        summary = extract_keywords_for_cluster(texts)
+        main_talking_points.append(summary)
     grouped_df['main_talking_points'] = main_talking_points
-
-
-    #now to analyze sentiment for each cluster
+    
+    #analyze sentiments for each cluster
     aggregated_sentiments = []
     all_sentiments = []
     for texts in grouped_df['text']:
         overall, sentiments = analyze_sentiments_for_texts(texts)
         aggregated_sentiments.append(overall)
         all_sentiments.append(sentiments)
-
+    
     grouped_df['aggregated_sentiment'] = aggregated_sentiments
     grouped_df['all_sentiments'] = all_sentiments
-
+    
     print(grouped_df[['cluster', 'main_talking_points', 'aggregated_sentiment']])
-   # final_df = grouped_df.drop(columns=['text'])
     return grouped_df
-    #final_df.to_csv("cluster_keywords_and_sentiments.csv", index=False)
 
-def summarizedf_to_dict(df, subreddit):
-    final = {"subreddit": subreddit, "clusters": []}
+
+def format_by_cluster(df, online_group_name=""):
+    #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
+    rows = []
+    for _, row in df.iterrows():
+        talking_points = row["main_talking_points"]
+        tmp_dict = {
+            'online_group_name': online_group_name, 
+            'cluster_label': talking_points,
+            'comment_count': len(row['text']), 
+            'aggregated_sentiment': row["aggregated_sentiment"], 
+            'all_sentiments': row["all_sentiments"]
+            }
+        rows.append(tmp_dict)
+
+    formatted_df = pd.DataFrame(rows)
+    return formatted_df
+
+def format_by_text(df, online_group_name=""):
+    #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
+    rows = []
+    for _, row in df.iterrows():
+
+        talking_points = row["main_talking_points"]
+
+        text_list = row['text']
+        if isinstance(text_list, str):
+            try:
+                text_list = ast.literal_eval(text_list)
+            except Exception as e:
+                print("Error evaluating row['text']:", text_list)
+                raise e
+
+        sentiment_list = row['all_sentiments']
+        if isinstance(sentiment_list, str):
+            try:
+                sentiment_list = ast.literal_eval(sentiment_list)
+            except Exception as e:
+                print("Error evaluating row['all_sentiments']:", sentiment_list)
+                raise e
+
+        for index, message in enumerate(text_list):
+            tmp_dict = {
+                'online_group_name': online_group_name, 
+                'cluster_label': talking_points,
+                'text': message, 
+                'sentiment': sentiment_list[index], 
+                }
+            rows.append(tmp_dict)
+
+    formatted_df = pd.DataFrame(rows)
+    return formatted_df
+
+
+def format_to_dict(df, online_group_name=""):
+    final = {"online_group_name": online_group_name, "clusters": []}
 
     for _, row in df.iterrows():
         talking_points = row["main_talking_points"]
-        #Convert to list only if it's a string representation
-        if isinstance(talking_points, str):
-            talking_points = ast.literal_eval(talking_points)
-        if isinstance(talking_points, list) and len(talking_points) > 0:
-            label = talking_points[:3] #top 3 main talking points
-        else: 
-            label = []
         tone = row["aggregated_sentiment"]
         comment_count = len(row['text'])
-        final["clusters"].append({"label": label, "tone": tone, "comment_count": comment_count})
+        final["clusters"].append({"label": talking_points, "tone": tone, "comment_count": comment_count})
 
     return final
