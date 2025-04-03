@@ -19,6 +19,10 @@ For each discovered cluster, the tool:
 
 This example is based off of 1200 r/politics comments from the top 200 posts within the last year (Date of Writing: 2025-04-02)
 
+<details>
+<summary>click to view output example</summary>
+
+```python
 {
     'subreddit': 'politics',
     'clusters': [
@@ -87,6 +91,10 @@ This example is based off of 1200 r/politics comments from the top 200 posts wit
         }
     ]
 }
+```
+
+</details>
+
 
 **Architecture:**
 
