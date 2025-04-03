@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     summarize_df = summarize_clusters(df)
 
-    fin = summarizedf_to_dict(summarize_df)
+    fin = summarizedf_to_dict(summarize_df, "conservative")
 
     print(fin)
 
