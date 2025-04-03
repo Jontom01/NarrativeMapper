@@ -106,7 +106,7 @@ CSV Text Data ----> Embeddings (embeddings.py) ----> Cluster (clustering.py) ---
 
 ----------------------------------------------------------------------------------------------------------------------------
 
-*reddit_Scraper.py:*
+*reddit_scraper.py:*
 Used to scrape reddit comments (Reddit PRAW). This data is then turned into a csv file.
 
 *embeddings.py:*
