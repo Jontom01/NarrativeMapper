@@ -21,7 +21,7 @@ Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
 
-Output using format_to_dict() function. Useful for JSON export.
+Output using **format_to_dict()** function. Useful for JSON export.
 
 ```python
 {
@@ -74,7 +74,7 @@ Output using format_to_dict() function. Useful for JSON export.
 
 Two other formatting functions are available, format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
 
-format_by_cluster() returns columns:
+**format_by_cluster()** returns columns:
 
 - online_group_name - online group name
 
@@ -90,7 +90,7 @@ example to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_2.csv)
 
-format_by_text() returns columns:
+**format_by_text()** returns columns:
 
 - online_group_name - online group name
 
