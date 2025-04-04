@@ -78,11 +78,11 @@ Other formatting functions are available. Both format_by_text() and format_by_cl
 
 format_by_cluster() example to showcase output format:
 
-[See full output CSV →](./example_outputs/test_2.csv)
+[click to view CSV](.unrelated_to_package/example_outputs/test_2.csv)
 
 format_by_text() example output to showcase output format:
 
-[See full output CSV →](./example_outputs/test_1.csv)
+[click to view CSV](.unrelated_to_package/example_outputs/test_1.csv)
 
 **Pipeline Architecture:**
 
@@ -103,3 +103,56 @@ Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (di
 
 *formatters.py:*
 Formats summarized clusters into useful forms for data analysis.
+
+**How to Use:**
+
+*Option 1: High-Level Class-Based Interface*
+
+<details>
+<summary><strong>click to view class-based usage</strong></summary>
+
+```python
+#initialize NarrativeMapper object
+mapper = NarrativeMapper("r/antiwork")
+
+#embeds semantic vectors
+mapper.load_embeddings("path/to/your/file.csv")
+
+#clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
+mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+
+#summarize each cluster's topic and sentiment
+mapper.summarize()
+
+#export in your preferred format
+summary_dict = mapper.format_to_dict()
+text_df = mapper.format_by_text()
+cluster_df = mapper.format_by_cluster()
+
+#saving DataFrames to csv
+text_df.to_csv("comments_by_cluster.csv", index=False)
+cluster_df.to_csv("cluster_summary.csv", index=False)
+```
+
+</details>
+
+---
+
+*Option 2: Low-Level Functional Interface*
+
+<details>
+<summary><strong>click to view function-based usage</strong></summary>
+
+```python
+#manual control over each step:
+embeddings = get_embeddings("path/to/your/file.csv")
+cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+summary_df = summarize_clusters(cluster_df)
+
+#export/format options
+summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
+text_df = format_by_text(summary_df, online_group_name="r/antiwork")
+cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
+```
+
+</details>
