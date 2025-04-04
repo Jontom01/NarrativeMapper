@@ -14,11 +14,7 @@ For each discovered cluster, the tool:
 
 - Outputs structured summaries of the narrative + emotion pairs
 
-*Install via:*
-
-[PyPI](https://pypi.org/project/NarrativeMapper/)
-
-or 
+*Install via [PyPI](https://pypi.org/project/NarrativeMapper/):* 
 
 ```bash
 pip install NarrativeMapper
