@@ -14,7 +14,15 @@ For each discovered cluster, the tool:
 
 - Outputs structured summaries of the narrative + emotion pairs
 
-Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
+*Install via:*
+
+[PyPI](https://pypi.org/project/NarrativeMapper/)
+
+or 
+
+```bash
+pip install NarrativeMapper
+```
 
 
 **Example Output:**
@@ -135,7 +143,7 @@ To use this package, you'll need an OpenAI API key. Create a .env file in your r
 Inside the .env file, add your API key like this:
 
 ```dotenv
-   OPENAI_API_KEY="your-api-key-here"
+OPENAI_API_KEY="your-api-key-here"
 ```
 
 The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
