@@ -103,6 +103,20 @@ Formats summarized clusters into useful forms for data analysis.
 
 **How to Use:**
 
+
+# IMPORTANT:
+
+To use this package, you'll need an OpenAI API key. Create a .env file in your root directory (same folder where your script runs).
+
+Inside the .env file, add your API key like this:
+
+```dotenv
+   OPENAI_API_KEY="your-api-key-here"
+```
+
+the package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
+
+
 *Option 1: High-Level Class-Based Interface*
 
 ```python
