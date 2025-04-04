@@ -14,6 +14,8 @@ For each discovered cluster, the tool:
 
 - Outputs structured summaries of the narrative + emotion pairs
 
+Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
+
 **Example Output:**
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
