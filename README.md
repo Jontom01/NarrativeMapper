@@ -16,6 +16,8 @@ For each discovered cluster, the tool:
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 
+
+
 **Example Output:**
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
@@ -81,6 +83,8 @@ format_by_text() example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
+
+
 **Pipeline Architecture:**
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -100,6 +104,8 @@ Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (di
 
 *formatters.py:*
 Formats summarized clusters into useful forms for data analysis.
+
+
 
 **How to Use:**
 
