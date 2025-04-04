@@ -69,6 +69,7 @@ This example is based off of 1800 r/conservatives comments from the top 300 post
 </details>
 
 Other formatting methods are available. Both summarize.format_by_text() and summarize.format_by_cluster() return dataframes that offer better format for data analysis. 
+
 **Architecture:**
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ Converts comments into 3072 dimensional vectors (OPEN AI's text-embedding-3-larg
 Clusters embedding vectors using UMAP + HDBSCAN. I reduced the dimensions to 50 during reduction (after some attempts and fails). The other variables related to dimension reduction and clustering are dependent on the ammount of vectors (comments).
 
 *summarize.py:*
-Extracts keywords (KeyBERT) and semantics (distilbert-base-uncased-finetuned-sst-2-english) for each cluster. I assign cluster label names based off the following OpenAI Chat Completions prompt. 
+Extracts cluster summaries (4o-gpt-mini Chat Completion) and semantics (distilbert-base-uncased-finetuned-sst-2-english) for each cluster. I assign cluster label names based off the following OpenAI Chat Completions prompt. 
 
 <details>
 <summary>click to view prompt</summary>

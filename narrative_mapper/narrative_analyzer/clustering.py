@@ -5,7 +5,8 @@ from sklearn.metrics.pairwise import pairwise_distances
 import numpy as np
 import pandas as pd
 import csv
-def cluster_embeddings(embeddings_dict: list[dict], n_components_var=50, n_neighbors_var=70, min_cluster_size_var=50):
+
+def cluster_embeddings(embeddings_dict: list[dict], n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15):
 
     embeddings = []
     for item in embeddings_dict:
@@ -13,8 +14,8 @@ def cluster_embeddings(embeddings_dict: list[dict], n_components_var=50, n_neigh
         
     #UMAP dimensionality:
     umap_reducer = umap.UMAP(
-        n_neighbors=n_neighbors_var,
-        n_components=n_components_var,
+        n_neighbors=n_neighbors,
+        n_components=n_components,
         metric='cosine',
         min_dist=0.0,
         random_state=42       
@@ -25,8 +26,8 @@ def cluster_embeddings(embeddings_dict: list[dict], n_components_var=50, n_neigh
 
     #HDBSCAN clustering:
     clusterer = hdbscan.HDBSCAN(
-        min_cluster_size=min_cluster_size_var,
-        min_samples=15,
+        min_cluster_size=min_cluster_size,
+        min_samples=min_samples,
         metric='precomputed',
         cluster_selection_method='eom'
     )
@@ -35,7 +36,7 @@ def cluster_embeddings(embeddings_dict: list[dict], n_components_var=50, n_neigh
     for item in embeddings_dict:
         item['cluster'] = cluster_labels[i]
         i += 1
-    print(len(embeddings_dict),'\n')
+        
     num_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
     print(f"HDBSCAN found {num_clusters} clusters.")
 
