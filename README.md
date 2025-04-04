@@ -1,6 +1,6 @@
 # NarrativeMapper
 
-**Overview:**
+### Overview:
 
 The NarrativeMapper package is a discourse analysis pipeline that uncovers the dominant narratives and emotional tones within online communities.
 
@@ -14,14 +14,16 @@ For each discovered cluster, the tool:
 
 - Outputs structured summaries of the narrative + emotion pairs
 
-*Install via [PyPI](https://pypi.org/project/NarrativeMapper/):* 
+### Installation:
+
+Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
 ```bash
 pip install NarrativeMapper
 ```
 
 
-**Example Output:**
+### Output Formats:
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
 
@@ -109,7 +111,7 @@ example output to showcase output format:
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
 
-**Pipeline Architecture:**
+### Pipeline Architecture:
 
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -117,20 +119,20 @@ CSV Text Data --> Embeddings (embeddings.py) --> Cluster (clustering.py) --> Sum
 
 ----------------------------------------------------------------------------------------------------------------------------
 
-*embeddings.py:*
+**embeddings.py:**
 Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
 
-*clustering.py:*
+**clustering.py:**
 Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering.
 
-*summarize.py:*
+**summarize.py:**
 Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster. 
 
-*formatters.py:*
+**formatters.py:**
 Formats summarized clusters into useful forms for data analysis.
 
 
-**How to Use:**
+### How to Use:
 
 **IMPORTANT:**
 
@@ -145,7 +147,7 @@ OPENAI_API_KEY="your-api-key-here"
 The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
 
 
-*Option 1: High-Level Class-Based Interface*
+**Option 1: High-Level Class-Based Interface**
 
 ```python
 #initialize NarrativeMapper object
@@ -172,7 +174,7 @@ cluster_df.to_csv("cluster_summary.csv", index=False)
 
 ---
 
-*Option 2: Low-Level Functional Interface*
+**Option 2: Low-Level Functional Interface**
 
 
 ```python
