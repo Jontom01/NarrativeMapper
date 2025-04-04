@@ -22,9 +22,6 @@ This example is based off of 1800 r/antiwork comments from the top 300 posts wit
 
 Output using format_to_dict() function. Useful for JSON export.
 
-<details>
-<summary>click to view output example</summary>
-
 ```python
 {
     'online_group_name': 'r/antiwork',
@@ -74,8 +71,6 @@ Output using format_to_dict() function. Useful for JSON export.
 
 ```
 
-</details>
-
 Other formatting functions are available. Both format_by_text() and format_by_cluster() return pandas DataFrames that are well-suited for CSV export.
 
 format_by_cluster() example to showcase output format:
@@ -110,9 +105,6 @@ Formats summarized clusters into useful forms for data analysis.
 
 *Option 1: High-Level Class-Based Interface*
 
-<details>
-<summary><strong>click to view class-based usage</strong></summary>
-
 ```python
 #initialize NarrativeMapper object
 mapper = NarrativeMapper("r/antiwork")
@@ -136,14 +128,10 @@ text_df.to_csv("comments_by_cluster.csv", index=False)
 cluster_df.to_csv("cluster_summary.csv", index=False)
 ```
 
-</details>
-
 ---
 
 *Option 2: Low-Level Functional Interface*
 
-<details>
-<summary><strong>click to view function-based usage</strong></summary>
 
 ```python
 #manual control over each step:
@@ -156,5 +144,3 @@ summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
 text_df = format_by_text(summary_df, online_group_name="r/antiwork")
 cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
 ```
-
-</details>
