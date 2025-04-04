@@ -17,7 +17,6 @@ For each discovered cluster, the tool:
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 
 
-
 **Example Output:**
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
@@ -73,16 +72,37 @@ Output using format_to_dict() function. Useful for JSON export.
 
 ```
 
-Other formatting functions are available. Both format_by_text() and format_by_cluster() return pandas DataFrames that are well-suited for CSV export.
+Two other formatting functions are available, format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
 
-format_by_cluster() example to showcase output format:
+format_by_cluster() returns columns:
+
+- online_group_name - online group name
+
+- cluster_label - cluster summary/label
+
+- comment_count - sampled textual messages per cluster
+
+- aggregated_sentiment - net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
+
+- all_sentiments - this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
+
+example to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_2.csv)
 
-format_by_text() example output to showcase output format:
+format_by_text() returns columns:
+
+- online_group_name - online group name
+
+- cluster_label - cluster summary/label the textual message belongs to
+
+- text - the sampled textual message (this function returns all of them row by row)
+
+- sentiment - dict item holding sentiment calculation, of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
+
+example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
-
 
 
 **Pipeline Architecture:**
@@ -106,9 +126,7 @@ Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (di
 Formats summarized clusters into useful forms for data analysis.
 
 
-
 **How to Use:**
-
 
 **IMPORTANT:**
 
