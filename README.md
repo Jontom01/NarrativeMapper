@@ -78,11 +78,11 @@ Other formatting functions are available. Both format_by_text() and format_by_cl
 
 format_by_cluster() example to showcase output format:
 
-[click to view CSV](.unrelated_to_package/example_outputs/test_2.csv)
+[click to view CSV](unrelated_to_package/example_outputs/test_2.csv)
 
 format_by_text() example output to showcase output format:
 
-[click to view CSV](.unrelated_to_package/example_outputs/test_1.csv)
+[click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
 **Pipeline Architecture:**
 
