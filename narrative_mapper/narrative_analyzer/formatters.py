@@ -1,8 +1,22 @@
 import pandas as pd
 import ast
 
-def format_by_cluster(df, online_group_name=""):
+def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
+    """
+    Formats the summarized cluster output into a compact DataFrame where each row represents a cluster.
+
+    Includes the cluster label, sentiment info, and total comment count for each cluster.
+
+    Parameters:
+        df (pd.DataFrame): Output from summarize_clusters().
+        online_group_name (str): Label identifying the source community (e.g. subreddit name).
+
+    Returns:
+        pd.DataFrame: Cluster-level summary with one row per cluster.
+    """
+
     #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
+
     rows = []
     for _, row in df.iterrows():
         talking_points = row["main_talking_points"]
@@ -18,8 +32,22 @@ def format_by_cluster(df, online_group_name=""):
     formatted_df = pd.DataFrame(rows)
     return formatted_df
 
-def format_by_text(df, online_group_name=""):
+def format_by_text(df, online_group_name="") -> pd.DataFrame:
+    """
+    Flattens the summarized cluster output into a DataFrame where each row is an individual comment.
+
+    Includes the comment text, its cluster label, and associated sentiment.
+
+    Parameters:
+        df (pd.DataFrame): Output from summarize_clusters().
+        online_group_name (str): Label identifying the source community.
+
+    Returns:
+        pd.DataFrame: Text-level DataFrame with one row per message.
+    """
+
     #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
+
     rows = []
     for _, row in df.iterrows():
 
@@ -53,8 +81,20 @@ def format_by_text(df, online_group_name=""):
     formatted_df = pd.DataFrame(rows)
     return formatted_df
 
+def format_to_dict(df, online_group_name="") -> dict:
+    """
+    Converts the summarized cluster output into a dictionary format useful for JSON export.
 
-def format_to_dict(df, online_group_name=""):
+    Each cluster includes its label, sentiment tone, and comment count.
+
+    Parameters:
+        df (pd.DataFrame): Output from summarize_clusters().
+        online_group_name (str): Label identifying the source community.
+
+    Returns:
+        dict: A structured dictionary with cluster summaries.
+    """
+
     final = {"online_group_name": online_group_name, "clusters": []}
 
     for _, row in df.iterrows():

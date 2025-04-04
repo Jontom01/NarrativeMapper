@@ -11,7 +11,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-def analyze_sentiments_for_texts(texts):
+def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
     """
     Analyze sentiment for a list of texts using the Hugging Face sentiment pipeline.
     Returns an overall aggregated sentiment and a list of individual sentiment results.
@@ -37,7 +37,12 @@ def analyze_sentiments_for_texts(texts):
         overall = "NEUTRAL"
     return overall, sentiments
 
-def extract_keywords_for_cluster(texts):
+def extract_keywords_for_cluster(texts) -> str:
+    """
+    Uses OpenAI Chat Completions to summarize the main theme of a cluster of texts.
+    Returns a concise 1-sentence summary string.
+    """
+
     prompt = f"""
         Here are comments/messages from the same topic cluster (after using embeddings to vectorize the text-semantics and then a clustering algorithm to group them):
         ---
@@ -54,7 +59,28 @@ def extract_keywords_for_cluster(texts):
     )
     return str(response.choices[0].message.content)
 
-def summarize_clusters(df):
+def summarize_clusters(df) -> pd.DataFrame:
+
+    """
+    Summarizes each text cluster by extracting the narrative and sentiment analysis of each cluster.
+
+    Given a DataFrame of clustered text (as returned by `cluster_embeddings`), this function:
+    - Samples up to 500 comments per cluster
+    - Uses OpenAI Chat Completions to generate a one-line summary of each cluster's main theme
+    - Applies a Hugging Face sentiment model to determine overall cluster sentiment
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing clustered text data with a 'cluster' and 'text' column.
+
+    Returns:
+        pd.DataFrame: A new DataFrame with columns:
+            - 'cluster': Cluster ID
+            - 'text': List of sampled texts
+            - 'main_talking_points': Cluster summary (from GPT)
+            - 'aggregated_sentiment': Overall sentiment label
+            - 'all_sentiments': List of individual sentiment results per text
+    """
+
     #group texts by cluster and sample up to 500 texts per cluster
     grouped_texts = {}
     grouped = df.groupby('cluster')
@@ -84,5 +110,3 @@ def summarize_clusters(df):
     grouped_df['all_sentiments'] = all_sentiments
     
     return grouped_df
-
-

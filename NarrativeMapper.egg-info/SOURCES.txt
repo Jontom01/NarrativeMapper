@@ -10,4 +10,5 @@ narrative_mapper/__init__.py
 narrative_mapper/narrative_analyzer/clustering.py
 narrative_mapper/narrative_analyzer/embeddings.py
 narrative_mapper/narrative_analyzer/formatters.py
+narrative_mapper/narrative_analyzer/narrative_mapper.py
 narrative_mapper/narrative_analyzer/summarize.py
