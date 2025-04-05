@@ -1,6 +1,6 @@
 # NarrativeMapper
 
-## Overview:
+## Overview
 
 The NarrativeMapper package is a discourse analysis pipeline that uncovers the dominant narratives and emotional tones within online communities.
 
@@ -15,7 +15,7 @@ For each discovered cluster, the tool:
 - Outputs structured summaries of the narrative + emotion pairs
 
 ---
-## Installation:
+## Installation
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
@@ -24,7 +24,7 @@ pip install NarrativeMapper
 ```
 
 ---
-## Output Formats:
+## Output Formats
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
 
@@ -124,26 +124,22 @@ All three of these functions format the input DataFrame from the summarize_clust
 ## Pipeline Architecture & API Overview
 
 ```txt
-CSV Text Data --> Embeddings (embeddings.py) --> Cluster (clustering.py) --> Summarize (summarize.py)  --> Formatting (formatters.py)
+CSV Text Data --> Embeddings --> Cluster --> Summarize  --> Formatting
 ```
 
-**embeddings.py:**
+**get_embeddings()**
 Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
-Associated Functions: **get_embeddings()**
 
-**clustering.py:**
-Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering.
-Associated Functions: **cluster_embeddings()**
+**cluster_embeddings()**
+Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering. 
 
-**summarize.py:**
-Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster. 
-Associated Functions: **summarize_cluster()**
+**summarize_cluster()**
+Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster.
 
-**formatters.py:**
+**format_to_dict()**, **format_by_cluster()**, **format_by_text()**
 Formats summarized clusters into usable formats for analysis or export.
-Associated Functions: **format_to_dict()**, **format_by_cluster()**, **format_by_text()**
 
-### NarrativeMapper Class:
+### NarrativeMapper Class
 
 **Instance Attributes:**
 
@@ -167,7 +163,7 @@ format_by_cluster()
 format_to_dict()
 ```
 
-### Parameter Reference:
+### Parameter Reference
 
 <details>
 <summary><strong>Click to expand</strong></summary>
@@ -178,10 +174,10 @@ format_to_dict()
 - min_samples: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
 - chunk_size (load_embeddings): Number of messages processed per API request to avoid token limits.
 - max_sample_size (summarize): Maximum number of comments sampled per cluster for summarization.
-</details>```
+```</details>
 
 ---
-## How to Use:
+## How to Use
 
 **IMPORTANT:**
 
