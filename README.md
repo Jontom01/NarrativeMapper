@@ -167,14 +167,13 @@ format_to_dict()
 
 <details>
 <summary><strong>Click to expand</strong></summary>
-```txt
 - n_components: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
 - n_neighbors: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
 - min_cluster_size: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
 - min_samples: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
 - chunk_size (load_embeddings): Number of messages processed per API request to avoid token limits.
 - max_sample_size (summarize): Maximum number of comments sampled per cluster for summarization.
-```</details>
+</details>
 
 ---
 ## How to Use
