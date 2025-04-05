@@ -119,11 +119,9 @@ example output to showcase output format:
 ---
 ### Pipeline Architecture:
 
-----------------------------------------------------------------------------------------------------------------------------
 
 CSV Text Data --> Embeddings (embeddings.py) --> Cluster (clustering.py) --> Summarize (summarize.py)  --> Formatting (formatters.py)
 
-----------------------------------------------------------------------------------------------------------------------------
 
 **embeddings.py:**
 Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
