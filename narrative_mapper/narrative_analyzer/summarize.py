@@ -59,7 +59,7 @@ def extract_keywords_for_cluster(texts) -> str:
     )
     return str(response.choices[0].message.content)
 
-def summarize_clusters(df) -> pd.DataFrame:
+def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFrame:
 
     """
     Summarizes each text cluster by extracting the narrative and sentiment analysis of each cluster.
@@ -71,12 +71,13 @@ def summarize_clusters(df) -> pd.DataFrame:
 
     Parameters:
         df (pd.DataFrame): DataFrame containing clustered text data with a 'cluster' and 'text' column.
+        max_sample_size (int): max length of text list for each cluster being sampled
 
     Returns:
         pd.DataFrame: A new DataFrame with columns:
             - 'cluster': Cluster ID
             - 'text': List of sampled texts
-            - 'main_talking_points': Cluster summary (from GPT)
+            - 'cluster_summary': Cluster summary (from GPT)
             - 'aggregated_sentiment': Overall sentiment label
             - 'all_sentiments': List of individual sentiment results per text
     """
@@ -85,18 +86,18 @@ def summarize_clusters(df) -> pd.DataFrame:
     grouped_texts = {}
     grouped = df.groupby('cluster')
     for cluster, group in grouped:
-        sample_size = min(500, len(group))
+        sample_size = min(max_sample_size, len(group))
         grouped_texts[cluster] = group['text'].sample(n=sample_size, random_state=42).tolist()
     
 
     grouped_df = pd.DataFrame(list(grouped_texts.items()), columns=['cluster', 'text'])
     
     #use OpenAI Chat Completions to extract a concise summary (cluster label) for each cluster
-    main_talking_points = []
+    cluster_summary = []
     for texts in grouped_df['text']:
         summary = extract_keywords_for_cluster(texts)
-        main_talking_points.append(summary)
-    grouped_df['main_talking_points'] = main_talking_points
+        cluster_summary.append(summary)
+    grouped_df['cluster_summary'] = cluster_summary
     
     #analyze sentiments for each cluster
     aggregated_sentiments = []

@@ -14,6 +14,7 @@ For each discovered cluster, the tool:
 
 - Outputs structured summaries of the narrative + emotion pairs
 
+---
 ### Installation:
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
@@ -22,7 +23,7 @@ Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 pip install NarrativeMapper
 ```
 
-
+---
 ### Output Formats:
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
@@ -31,51 +32,52 @@ Output using **format_to_dict()** function. Useful for JSON export.
 
 ```python
 {
-    'online_group_name': 'r/antiwork',
-    'clusters': [
+    "online_group_name": "r/antiwork",
+    "clusters": [
         {
-            'label': 'The core theme of this cluster revolves around frustrations and criticisms of modern job application processes, including exploitative practices, ineffective interviews, and the use of AI and personality tests that often discriminate against neurodiverse individuals.',
-            'tone': 'NEGATIVE',
-            'comment_count': 74
+            "cluster": 0,
+            "cluster_summary": "The core theme of this cluster revolves around the frustrations and challenges of the modern job application and interview process, highlighting issues such as discrimination, exploitative practices, and the disconnect between employers and candidates.",
+            "tone": "NEGATIVE",
+            "comment_count": 76
         },
         {
-            'label': 'The core themes of this cluster revolve around the challenges of low wages in the fast food and service industries, the rising cost of living, and the perceived disconnect between corporate profits and employee compensation.',
-            'tone': 'NEGATIVE',
-            'comment_count': 109
+            "cluster": 1,
+            "cluster_summary": "The core theme of this cluster revolves around the debate over low wages in the fast food industry, the impact of wage increases on business practices and pricing, and the broader implications for workers' livelihoods and economic conditions.",
+            "tone": "NEGATIVE",
+            "comment_count": 100
         },
         {
-            'label': 'The core theme of this cluster revolves around employee dissatisfaction with workplace policies, management practices, and the struggle for work-life balance, often highlighting issues of wage theft, lack of respect for personal time, and the negative impact of corporate culture on mental health.',
-            'tone': 'NEGATIVE',
-            'comment_count': 500
+            "cluster": 2,
+            "cluster_summary": "The cluster reflects widespread frustration and despair among younger generations regarding economic instability, unaffordable living costs, inadequate healthcare, and the perceived indifference of older generations towards their struggles.",
+            "tone": "NEGATIVE",
+            "comment_count": 112
         },
         {
-            'label': "The core theme of this cluster revolves around the dissatisfaction with traditional work schedules, advocating for shorter workweeks and better work-life balance, while highlighting the negative impact of long hours and inadequate parental leave on individuals' well-being.",
-            'tone': 'NEGATIVE',
-            'comment_count': 83
+            "cluster": 3,
+            "cluster_summary": "The core theme of this cluster revolves around employee dissatisfaction with management practices, workplace exploitation, and the importance of asserting one's rights and boundaries in a toxic work environment.",
+            "tone": "NEGATIVE",
+            "comment_count": 464
         },
         {
-            'label': "The core theme of this cluster revolves around workers' struggles for fair wages, unionization, and collective action against corporate exploitation, particularly in the context of Boeing.",
-            'tone': 'NEGATIVE',
-            'comment_count': 56
+            "cluster": 4,
+            "cluster_summary": "The core theme of this cluster revolves around dissatisfaction with traditional work structures, advocating for reduced work hours, better work-life balance, and criticism of corporate exploitation and the lack of employee rights.",
+            "tone": "NEGATIVE",
+            "comment_count": 95
         },
         {
-            'label': 'The comments primarily express strong criticism of Elon Musk and the corporate culture surrounding wealth accumulation, highlighting issues of exploitation, inequality, and the disconnect between CEOs and their employees.',
-            'tone': 'NEGATIVE',
-            'comment_count': 50
+            "cluster": 5,
+            "cluster_summary": "The core theme of this cluster revolves around wealth inequality, criticizing the hoarding of wealth by billionaires and the systemic issues that perpetuate economic disparity and exploitation of the working class.",
+            "tone": "NEGATIVE",
+            "comment_count": 95
         },
         {
-            'label': 'The core theme of this cluster revolves around the critique of wealth inequality and capitalism, highlighting the exploitation of workers, the concentration of wealth among the elite, and the systemic issues that perpetuate economic disparity and social injustice.',
-            'tone': 'NEGATIVE',
-            'comment_count': 157
-        },
-        {
-            'label': 'The comments reflect widespread frustration and despair among younger generations regarding financial instability, lack of affordable housing, inadequate retirement planning, and the perception of being exploited in the workforce, often contrasting their struggles with the experiences of older generations.',
-            'tone': 'NEGATIVE',
-            'comment_count': 92
+            "cluster": 6,
+            "cluster_summary": "The comments express strong criticism of capitalism, highlighting themes of exploitation, corporate greed, and the detrimental impact of billionaires and CEOs on workers and society.",
+            "tone": "NEGATIVE",
+            "comment_count": 89
         }
     ]
 }
-
 ```
 
 Two other formatting functions are available, format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
@@ -84,7 +86,9 @@ Two other formatting functions are available, format_by_text() and format_by_clu
 
 - online_group_name - online group name
 
-- cluster_label - cluster summary/label
+- cluster - numeric cluster number
+
+- cluster_summary - summary of the cluster
 
 - comment_count - sampled textual messages per cluster
 
@@ -100,7 +104,9 @@ example to showcase output format:
 
 - online_group_name - online group name
 
-- cluster_label - cluster summary/label the textual message belongs to
+- cluster - numeric cluster number
+
+- cluster_summary - summary of the cluster
 
 - text - the sampled textual message (this function returns all of them row by row)
 
@@ -110,7 +116,7 @@ example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
-
+---
 ### Pipeline Architecture:
 
 ----------------------------------------------------------------------------------------------------------------------------
@@ -131,7 +137,7 @@ Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (di
 **formatters.py:**
 Formats summarized clusters into useful forms for data analysis.
 
-
+---
 ### How to Use:
 
 **IMPORTANT:**
@@ -154,13 +160,13 @@ The package will automatically load your key using python-dotenv. (Make sure to 
 mapper = NarrativeMapper("r/antiwork")
 
 #embeds semantic vectors
-mapper.load_embeddings("path/to/your/file.csv")
+mapper.load_embeddings("path/to/your/file.csv", chunk_size=1000)
 
 #clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
 mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
 
 #summarize each cluster's topic and sentiment
-mapper.summarize()
+mapper.summarize(max_sample_size=500)
 
 #export in your preferred format
 summary_dict = mapper.format_to_dict()
@@ -172,10 +178,7 @@ text_df.to_csv("comments_by_cluster.csv", index=False)
 cluster_df.to_csv("cluster_summary.csv", index=False)
 ```
 
----
-
 **Option 2: Low-Level Functional Interface**
-
 
 ```python
 #manual control over each step:

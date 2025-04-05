@@ -12,7 +12,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def chunk_list(big_list, chunk_size=500):
     return [big_list[i:i + chunk_size] for i in range(0, len(big_list), chunk_size)]
 
-def get_embeddings(file_name: str) -> list[dict]:
+def get_embeddings(file_name: str, chunk_size: int=500) -> list[dict]:
     """
     Retrieves OpenAI embeddings for a large list of text entries by chunking the input to stay within token limits.
 
@@ -21,6 +21,7 @@ def get_embeddings(file_name: str) -> list[dict]:
 
     Parameters:
         file_name (str): Path to .csv file containing the input data.
+        chunk_size (int): length of text-list chunks being send to OpenAI embeddings
 
     Returns:
         list of dict: Same dictionaries with added 'embedding_vector' key.
@@ -30,7 +31,7 @@ def get_embeddings(file_name: str) -> list[dict]:
         reader = csv.DictReader(f)
         text_list = list(reader)
 
-    text_list_2d = chunk_list(text_list) #this chunks the list of texts dicts into 500 by N 2D list. This lets us batch call Open AI embeddings
+    text_list_2d = chunk_list(text_list, chunk_size) #this chunks the list of texts dicts into chunk_size by N 2D list. This lets us batch call Open AI embeddings
     embedding_dict = [] #this will hold a list of all the text dict items after they have added 'embedded_vector'
     for comment_list in text_list_2d:
         embedding_dict_tmp = get_embeddings_requests(comment_list) #the text list with embeddings for just 1 row of the 2D 500 by N list

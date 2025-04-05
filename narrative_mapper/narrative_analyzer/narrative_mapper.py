@@ -25,17 +25,18 @@ class NarrativeMapper:
         self.cluster_df = None
         self.summary_df = None
 
-    def load_embeddings(self, file_path: str) -> "NarrativeMapper":
+    def load_embeddings(self, file_path: str, chunk_size: int=500) -> "NarrativeMapper":
         """
         Loads and processes text data to obtain OpenAI embeddings.
         
         Parameters:
             file_path (str): Path to the .csv file containing text data.
+            chunk_size (int): length of text-list chunks being send to OpenAI embeddings
         
         Returns:
             NarrativeMapper: Self, with embeddings loaded.
         """
-        self.embeddings = get_embeddings(file_path)
+        self.embeddings = get_embeddings(file_path, chunk_size)
         return self
 
     def cluster(self, n_components: int = 20, n_neighbors: int = 20,
@@ -62,14 +63,17 @@ class NarrativeMapper:
         )
         return self
 
-    def summarize(self) -> "NarrativeMapper":
+    def summarize(self, max_sample_size: int=500) -> "NarrativeMapper":
         """
         Summarizes each cluster using GPT-based keyword extraction and sentiment analysis.
+
+        Parameters:
+            max_sample_size (int): max length of text list for each cluster being sampled
         
         Returns:
             NarrativeMapper: Self, with summarized clusters stored.
         """
-        self.summary_df = summarize_clusters(self.cluster_df)
+        self.summary_df = summarize_clusters(self.cluster_df, max_sample_size)
         return self
 
     def format_by_text(self) -> pd.DataFrame:

@@ -15,22 +15,15 @@ def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
         pd.DataFrame: Cluster-level summary with one row per cluster.
     """
 
-    #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
-
-    rows = []
+    df = df.copy()
+    comment_count = []
     for _, row in df.iterrows():
-        talking_points = row["main_talking_points"]
-        tmp_dict = {
-            'online_group_name': online_group_name, 
-            'cluster_label': talking_points,
-            'comment_count': len(row['text']), 
-            'aggregated_sentiment': row["aggregated_sentiment"], 
-            'all_sentiments': row["all_sentiments"]
-            }
-        rows.append(tmp_dict)
-
-    formatted_df = pd.DataFrame(rows)
-    return formatted_df
+        comment_count.append(len(row['text']))
+    df['comment_count'] = comment_count   
+    df = df.drop(columns=['text'])
+    df['online_group_name'] = online_group_name
+    df = df[['online_group_name', 'cluster', 'cluster_summary', 'comment_count', 'aggregated_sentiment', 'all_sentiments']]
+    return df
 
 def format_by_text(df, online_group_name="") -> pd.DataFrame:
     """
@@ -47,11 +40,11 @@ def format_by_text(df, online_group_name="") -> pd.DataFrame:
     """
 
     #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
-
+    df = df.copy()
     rows = []
     for _, row in df.iterrows():
 
-        talking_points = row["main_talking_points"]
+        cluster_summary = row["cluster_summary"]
 
         text_list = row['text']
         if isinstance(text_list, str):
@@ -68,11 +61,12 @@ def format_by_text(df, online_group_name="") -> pd.DataFrame:
             except Exception as e:
                 print("Error evaluating row['all_sentiments']:", sentiment_list)
                 raise e
-
-        for index, message in enumerate(text_list):
+        cluster = row['cluster']
+        for index, message in enumerate(text_list): #did enumerate so i can index sentiment_list
             tmp_dict = {
-                'online_group_name': online_group_name, 
-                'cluster_label': talking_points,
+                'online_group_name': online_group_name,
+                'cluster': cluster, 
+                'cluster_summary': cluster_summary,
                 'text': message, 
                 'sentiment': sentiment_list[index], 
                 }
@@ -94,13 +88,14 @@ def format_to_dict(df, online_group_name="") -> dict:
     Returns:
         dict: A structured dictionary with cluster summaries.
     """
-
+    df = df.copy()
     final = {"online_group_name": online_group_name, "clusters": []}
 
     for _, row in df.iterrows():
-        talking_points = row["main_talking_points"]
+        cluster_summary = row["cluster_summary"]
         tone = row["aggregated_sentiment"]
         comment_count = len(row['text'])
-        final["clusters"].append({"label": talking_points, "tone": tone, "comment_count": comment_count})
+        cluster = row["cluster"]
+        final["clusters"].append({"cluster": cluster, "cluster_summary": cluster_summary, "tone": tone, "comment_count": comment_count})
 
     return final
