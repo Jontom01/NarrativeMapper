@@ -2,18 +2,15 @@
 
 ## Overview
 
-The NarrativeMapper package is a discourse analysis pipeline that uncovers the dominant narratives and emotional tones within online communities.
+NarrativeMapper is a discourse analysis tool that extracts dominant narratives and emotional tone from online communities using:
 
-This project processes textual messages from .csv files, then applies OpenAI’s embedding API (text-embedding-3-large) to convert each message into semantic vectors. These embeddings are clustered using UMAP for dimensionality reduction and HDBSCAN for density-based clustering.
+- OpenAI Embeddings (Open AI text-embedding-3-large)
 
-For each discovered cluster, the tool:
+- Dimensionality reduction (UMAP)
 
-- Extracts the main talking points OpenAI Chat Completions
+- Density-based clustering (HDBSCAN)
 
-- Analyzes the emotional tone using a Hugging Face sentiment classifier
-
-- Outputs structured summaries of the narrative + emotion pairs
-
+- Topic + sentiment extraction (Open AI Chat Completions + Hugging Face distilbert-base-uncased-finetuned-sst-2-english)
 ---
 ## Installation
 
@@ -30,7 +27,10 @@ This example is based off of 1800 r/antiwork comments from the top 300 posts wit
 
 Output using **format_to_dict()** function. Useful for JSON export.
 
-```python
+<details>
+<summary><strong>Click to expand</strong></summary>
+
+```json
 {
     "online_group_name": "r/antiwork",
     "clusters": [
@@ -78,7 +78,9 @@ Output using **format_to_dict()** function. Useful for JSON export.
         }
     ]
 }
-```
+</details>
+
+ ```
 
 Two other formatting functions are available, format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
 
@@ -167,13 +169,15 @@ format_to_dict()
 
 <details>
 <summary><strong>Click to expand</strong></summary>
-- n_components: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
-- n_neighbors: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
-- min_cluster_size: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
-- min_samples: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
-- chunk_size (load_embeddings): Number of messages processed per API request to avoid token limits.
-- max_sample_size (summarize): Maximum number of comments sampled per cluster for summarization.
-</details>
+```text
+- **n_components**: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.<br>
+- **n_neighbors**: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.<br>
+- **min_cluster_size**: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.<br>
+- **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.<br>
+- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.<br>
+- **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.<br>
+</details>```
+
 
 ---
 ## How to Use
