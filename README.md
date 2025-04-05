@@ -11,7 +11,7 @@ NarrativeMapper is a discourse analysis tool that extracts dominant narratives a
 - Density-based clustering (HDBSCAN)
 
 - Topic + sentiment extraction (Open AI Chat Completions + Hugging Face distilbert-base-uncased-finetuned-sst-2-english)
----
+
 ## Installation
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
@@ -20,7 +20,7 @@ Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 pip install NarrativeMapper
 ```
 
----
+
 ## Output Formats
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03).
@@ -28,6 +28,8 @@ This example is based off of 1800 r/antiwork comments from the top 300 posts wit
 The three formatter functions return the following:
 
 **format_to_dict()** returns dict, useful for JSON export.
+
+<div style="max-height: 400px; overflow: auto;">
 
 ```json
 {
@@ -78,6 +80,7 @@ The three formatter functions return the following:
     ]
 } 
 ```
+</div>
 
 **format_by_cluster()** returns pandas DataFrame with columns:
 
@@ -125,7 +128,7 @@ example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
----
+
 ## Pipeline Architecture & API Overview
 
 **Pipeline:**
@@ -186,9 +189,8 @@ format_to_dict()
 - **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.<br>
 - **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.<br>
 - **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.<br>
-</details>```
+```</details>
 
----
 ## How to Use
 
 **IMPORTANT:**
