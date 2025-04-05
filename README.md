@@ -32,20 +32,6 @@ OPENAI_API_KEY="your-api-key-here"
 
 The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
 
-**Open API Pricing:**
-<details>
-<summary><strong>Click to expand</strong></summary>
-
-The OpenAI text-embedding-3-large model costs approximately $13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
-
-The Chat Completions model used for summarization (gpt-4o-mini) is $15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
-
-The input prompt (excluding the text) and output summary from gpt-4o-mini are both very short (typically under 100 tokens), so their cost contribution is negligible.
-
-In practice, **total cost per 1 million tokens ranges from $0.13 to $0.28**, depending on how many comments are processed per cluster.
-
-For reference: running the r/antiwork example with max_sample_size=600, costs approximately $0.02.
-</details>
 
 ## Output Formats
 
@@ -147,6 +133,46 @@ The three formatter functions return the following:
 
 [CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_1.csv)
 
+## How to Use
+
+**Option 1: High-Level Class-Based Interface**
+
+```python
+#initialize NarrativeMapper object
+mapper = NarrativeMapper("r/antiwork")
+
+#embeds semantic vectors
+mapper.load_embeddings("path/to/your/file.csv", chunk_size=1000)
+
+#clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
+mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+
+#summarize each cluster's topic and sentiment
+mapper.summarize(max_sample_size=500)
+
+#export in your preferred format
+summary_dict = mapper.format_to_dict()
+text_df = mapper.format_by_text()
+cluster_df = mapper.format_by_cluster()
+
+#saving DataFrames to csv
+text_df.to_csv("comments_by_cluster.csv", index=False)
+cluster_df.to_csv("cluster_summary.csv", index=False)
+```
+
+**Option 2: Low-Level Functional Interface**
+
+```python
+#manual control over each step:
+embeddings = get_embeddings("path/to/your/file.csv", chunk_size=1000)
+cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+summary_df = summarize_clusters(cluster_df, max_sample_size=500)
+
+#export/format options
+summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
+text_df = format_by_text(summary_df, online_group_name="r/antiwork")
+cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
+```
 
 ## Pipeline Architecture & API Overview
 
@@ -221,43 +247,19 @@ format_to_dict()
 
 </details>
 
-## How to Use
+## Open API Pricing
 
-**Option 1: High-Level Class-Based Interface**
+Estimated cost: **$0.13 to $0.28 per 1 million tokens**.
 
-```python
-#initialize NarrativeMapper object
-mapper = NarrativeMapper("r/antiwork")
+Example: A CSV containing 1,000 Reddit comments costs approximately **$0.01** to process.
 
-#embeds semantic vectors
-mapper.load_embeddings("path/to/your/file.csv", chunk_size=1000)
+<details>
+<summary><strong>Click for pricing details</strong></summary>
 
-#clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
-mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+The OpenAI text-embedding-3-large model costs approximately $13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
 
-#summarize each cluster's topic and sentiment
-mapper.summarize(max_sample_size=500)
+The Chat Completions model used for summarization (gpt-4o-mini) is $15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
 
-#export in your preferred format
-summary_dict = mapper.format_to_dict()
-text_df = mapper.format_by_text()
-cluster_df = mapper.format_by_cluster()
+The gpt-4o-mini input prompt (excluding the text) and output summary are both very short (<100 tokens), so their cost contribution is negligible.
 
-#saving DataFrames to csv
-text_df.to_csv("comments_by_cluster.csv", index=False)
-cluster_df.to_csv("cluster_summary.csv", index=False)
-```
-
-**Option 2: Low-Level Functional Interface**
-
-```python
-#manual control over each step:
-embeddings = get_embeddings("path/to/your/file.csv", chunk_size=1000)
-cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
-summary_df = summarize_clusters(cluster_df, max_sample_size=500)
-
-#export/format options
-summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
-text_df = format_by_text(summary_df, online_group_name="r/antiwork")
-cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
-```
+</details>
