@@ -1,5 +1,6 @@
 # NarrativeMapper
 
+
 ## Overview
 
 NarrativeMapper is a discourse analysis tool that extracts dominant narratives and emotional tone from online communities using:
@@ -12,7 +13,10 @@ NarrativeMapper is a discourse analysis tool that extracts dominant narratives a
 
 - Topic Summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
 
+
 ## Installation and Setup
+
+**Installation:**
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
@@ -20,11 +24,11 @@ Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 pip install NarrativeMapper
 ```
 
-**IMPORTANT:**
+**Setup:**
 
-To use this package, you'll need an OpenAI API key. Create a .env file in your root directory (same folder where your script runs).
+1. Create a .env file in your root directory (same folder where your script runs).
 
-Inside the .env file, add your API key like this:
+2. Inside the .env file, add your OpenAPI key like this:
 
 ```dotenv
 OPENAI_API_KEY="your-api-key-here"
@@ -106,7 +110,7 @@ The three formatter functions return the following:
 
 - **aggregated_sentiment:** net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
 
-- **text:** - the list of textual messages that are part of the cluster
+- **text:** the list of textual messages that are part of the cluster
 
 - **all_sentiments:** this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
@@ -133,11 +137,14 @@ The three formatter functions return the following:
 
 [CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_1.csv)
 
+
 ## How to Use
 
 **Option 1: High-Level Class-Based Interface**
 
 ```python
+from narrative_mapper import *
+
 #initialize NarrativeMapper object
 mapper = NarrativeMapper("r/antiwork")
 
@@ -163,6 +170,8 @@ cluster_df.to_csv("cluster_summary.csv", index=False)
 **Option 2: Low-Level Functional Interface**
 
 ```python
+from narrative_mapper import *
+
 #manual control over each step:
 embeddings = get_embeddings("path/to/your/file.csv", chunk_size=1000)
 cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
@@ -246,6 +255,7 @@ format_to_dict()
 - **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.
 
 </details>
+
 
 ## Open API Pricing
 
