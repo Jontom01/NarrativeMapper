@@ -87,19 +87,19 @@ The three formatter functions return the following:
 <details>
 <summary><strong>format_by_cluster columns</strong></summary>
 
-- online_group_name - online group name
+- **online_group_name:** online group name
 
-- cluster - numeric cluster number
+- **cluster:** numeric cluster number
 
-- cluster_summary - summary of the cluster
+- **cluster_summary:** summary of the cluster
 
-- comment_count - sampled textual messages per cluster
+- **comment_count:** sampled textual messages per cluster
 
-- aggregated_sentiment - net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
+- **aggregated_sentiment:** net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
 
-- text - the list of textual messages that are part of the cluster
+- **text:** - the list of textual messages that are part of the cluster
 
-- all_sentiments - this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
+- **all_sentiments:** this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
 </details>
 
@@ -110,15 +110,15 @@ The three formatter functions return the following:
 <details>
 <summary><strong>format_by_text columns</strong></summary>
 
-- online_group_name - online group name
+- **online_group_name**: online group name
 
-- cluster - numeric cluster number
+- **cluster**: numeric cluster number
 
-- cluster_summary - summary of the cluster
+- **cluster_summary:** summary of the cluster
 
-- text - the sampled textual message (this function returns all of them row by row)
+- **text:** the sampled textual message (this function returns all of them row by row)
 
-- sentiment - dict item holding sentiment calculation, of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
+- **sentiment:** dict item holding sentiment calculation, of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
 </details>
 
@@ -180,14 +180,20 @@ format_to_dict()
 
 <details>
 <summary><strong>Click to expand</strong></summary>
-```txt
-- **n_components**: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.<br>
-- **n_neighbors**: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.<br>
-- **min_cluster_size**: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.<br>
-- **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.<br>
-- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.<br>
-- **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.<br>
-```</details>
+
+- **n_components**: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
+
+- **n_neighbors**: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
+
+- **min_cluster_size**: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
+
+- **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
+
+- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.
+
+- **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.
+
+</details>
 
 ## How to Use
 
