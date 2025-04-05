@@ -4,15 +4,15 @@
 
 NarrativeMapper is a discourse analysis tool that extracts dominant narratives and emotional tone from online communities using:
 
-- OpenAI Embeddings (Open AI text-embedding-3-large)
+- OpenAI Embeddings ([OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings))
 
-- Dimensionality reduction (UMAP)
+- Dimensionality reduction ([UMAP](https://umap-learn.readthedocs.io/en/latest/))
 
-- Density-based clustering (HDBSCAN)
+- Density-based clustering ([HDBSCAN](https://hdbscan.readthedocs.io/en/latest/))
 
-- Topic + sentiment extraction (Open AI Chat Completions + Hugging Face distilbert-base-uncased-finetuned-sst-2-english)
+- Topic Summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
 
-## Installation
+## Installation and Setup
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
@@ -20,6 +20,32 @@ Install via [PyPI](https://pypi.org/project/NarrativeMapper/):
 pip install NarrativeMapper
 ```
 
+**IMPORTANT:**
+
+To use this package, you'll need an OpenAI API key. Create a .env file in your root directory (same folder where your script runs).
+
+Inside the .env file, add your API key like this:
+
+```dotenv
+OPENAI_API_KEY="your-api-key-here"
+```
+
+The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
+
+**Open API Pricing:**
+<details>
+<summary><strong>Click to expand</strong></summary>
+
+The OpenAI text-embedding-3-large model costs approximately $13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
+
+The Chat Completions model used for summarization (gpt-4o-mini) is $15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
+
+The input prompt (excluding the text) and output summary from gpt-4o-mini are both very short (typically under 100 tokens), so their cost contribution is negligible.
+
+In practice, **total cost per 1 million tokens ranges from $0.13 to $0.28**, depending on how many comments are processed per cluster.
+
+For reference: running the r/antiwork example with max_sample_size=600, costs approximately $0.02.
+</details>
 
 ## Output Formats
 
@@ -100,7 +126,7 @@ The three formatter functions return the following:
 
 </details>
 
-[CSV to show output format](unrelated_to_package/example_outputs/test_2.csv)
+[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_2.csv)
 
 **format_by_text()** returns pandas DataFrame with columns:
 
@@ -119,7 +145,7 @@ The three formatter functions return the following:
 
 </details>
 
-[CSV to show output format](unrelated_to_package/example_outputs/test_1.csv)
+[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_1.csv)
 
 
 ## Pipeline Architecture & API Overview
@@ -196,18 +222,6 @@ format_to_dict()
 </details>
 
 ## How to Use
-
-**IMPORTANT:**
-
-To use this package, you'll need an OpenAI API key. Create a .env file in your root directory (same folder where your script runs).
-
-Inside the .env file, add your API key like this:
-
-```dotenv
-OPENAI_API_KEY="your-api-key-here"
-```
-
-The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
 
 **Option 1: High-Level Class-Based Interface**
 
