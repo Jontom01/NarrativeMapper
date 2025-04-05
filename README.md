@@ -29,7 +29,7 @@ The three formatter functions return the following:
 
 **format_to_dict()** returns dict, useful for JSON export.
 
-<div style="max-height: 400px; overflow: auto;">
+<div style="max-height: 300px; overflow: auto;">
 
 ```json
 {
@@ -134,22 +134,28 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```
 **Functions:**
 
-get_embeddings(file_path, chunk_size=...)
+**get_embeddings(file_path, chunk_size=...)**
+
 Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
 
-cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)
+**cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)**
+
 Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 
-summarize_clusters(clustered_df, max_sample_size=...)
+**summarize_clusters(clustered_df, max_sample_size=...)**
+
 Uses GPT (via Chat Completions) to label clusters and Hugging Face for sentiment analysis.
 
-format_to_dict(summary_df)
+**format_to_dict(summary_df)**
+
 Returns structured output as a dictionary (ideal for JSON export).
 
-format_by_cluster(summary_df)
+**format_by_cluster(summary_df)**
+
 Returns a DataFrame where each row summarizes a cluster.
 
-format_by_text(summary_df)
+**format_by_text(summary_df)**
+
 Returns a DataFrame where each row is an individual comment with its sentiment and cluster label.
 
 ### NarrativeMapper Class
