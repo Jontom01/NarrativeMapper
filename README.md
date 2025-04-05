@@ -23,12 +23,11 @@ pip install NarrativeMapper
 ---
 ## Output Formats
 
-This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
+This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03).
 
-Output using **format_to_dict()** function. Useful for JSON export.
+The three formatter functions return the following:
 
-<details>
-<summary><strong>Click to expand</strong></summary>
+**format_to_dict()** returns dict, useful for JSON export.
 
 ```json
 {
@@ -77,12 +76,10 @@ Output using **format_to_dict()** function. Useful for JSON export.
             "comment_count": 89
         }
     ]
-}
-</details>
+} 
+```
 
- ```
-
-Two other formatting functions are available, format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
+format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
 
 **format_by_cluster()** returns columns:
 
@@ -120,8 +117,6 @@ example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
-All three of these functions format the input DataFrame from the summarize_cluster() function.
-
 ---
 ## Pipeline Architecture & API Overview
 
@@ -129,16 +124,16 @@ All three of these functions format the input DataFrame from the summarize_clust
 CSV Text Data --> Embeddings --> Cluster --> Summarize  --> Formatting
 ```
 
-**get_embeddings()**
+**Embeddings: get_embeddings()**
 Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
 
-**cluster_embeddings()**
+**Cluster: cluster_embeddings()**
 Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering. 
 
-**summarize_cluster()**
+**Summarize: summarize_cluster()**
 Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster.
 
-**format_to_dict()**, **format_by_cluster()**, **format_by_text()**
+**Formatting: format_to_dict()**, **format_by_cluster()**, **format_by_text()**
 Formats summarized clusters into usable formats for analysis or export.
 
 ### NarrativeMapper Class
@@ -177,7 +172,6 @@ format_to_dict()
 - **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.<br>
 - **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.<br>
 </details>```
-
 
 ---
 ## How to Use
