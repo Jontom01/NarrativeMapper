@@ -103,9 +103,7 @@ The three formatter functions return the following:
 
 </details>
 
-example to showcase output format:
-
-[click to view CSV](unrelated_to_package/example_outputs/test_2.csv)
+[CSV to show output format](unrelated_to_package/example_outputs/test_2.csv)
 
 **format_by_text()** returns pandas DataFrame with columns:
 
@@ -124,18 +122,18 @@ example to showcase output format:
 
 </details>
 
-example output to showcase output format:
-
-[click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
+[CSV to show output format](unrelated_to_package/example_outputs/test_1.csv)
 
 
 ## Pipeline Architecture & API Overview
 
 **Pipeline:**
+
 ```txt
 CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```
 **Functions:**
+
 get_embeddings(file_path, chunk_size=...)
 Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
 
@@ -182,7 +180,7 @@ format_to_dict()
 
 <details>
 <summary><strong>Click to expand</strong></summary>
-```text
+```txt
 - **n_components**: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.<br>
 - **n_neighbors**: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.<br>
 - **min_cluster_size**: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.<br>
