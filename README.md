@@ -29,8 +29,6 @@ The three formatter functions return the following:
 
 **format_to_dict()** returns dict, useful for JSON export.
 
-<div style="max-height: 300px; overflow: auto;">
-
 ```json
 {
     "online_group_name": "r/antiwork",
@@ -80,7 +78,6 @@ The three formatter functions return the following:
     ]
 } 
 ```
-</div>
 
 **format_by_cluster()** returns pandas DataFrame with columns:
 
@@ -134,30 +131,27 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```
 **Functions:**
 
-**get_embeddings(file_path, chunk_size=...)**
+```python
 
-Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
+#Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
+get_embeddings(file_path, chunk_size=...)
 
-**cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)**
+#Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
+cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)
 
-Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
+#Uses GPT (via Chat Completions) to label clusters and Hugging Face for sentiment analysis.
+summarize_clusters(clustered_df, max_sample_size=...)
 
-**summarize_clusters(clustered_df, max_sample_size=...)**
+#Returns structured output as a dictionary (ideal for JSON export).
+format_to_dict(summary_df)
 
-Uses GPT (via Chat Completions) to label clusters and Hugging Face for sentiment analysis.
+#Returns a DataFrame where each row summarizes a cluster.
+format_by_cluster(summary_df)
 
-**format_to_dict(summary_df)**
+#Returns a DataFrame where each row is an individual comment with its sentiment and cluster label.
+format_by_text(summary_df)
 
-Returns structured output as a dictionary (ideal for JSON export).
-
-**format_by_cluster(summary_df)**
-
-Returns a DataFrame where each row summarizes a cluster.
-
-**format_by_text(summary_df)**
-
-Returns a DataFrame where each row is an individual comment with its sentiment and cluster label.
-
+```
 ### NarrativeMapper Class
 
 **Instance Attributes:**
@@ -195,7 +189,7 @@ format_to_dict()
 
 - **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
 
-- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits.
+- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
 
 - **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.
 
