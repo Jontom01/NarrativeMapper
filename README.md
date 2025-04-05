@@ -79,9 +79,10 @@ The three formatter functions return the following:
 } 
 ```
 
-format_by_text() and format_by_cluster(), both return pandas DataFrames that are well-suited for CSV export.
+**format_by_cluster()** returns pandas DataFrame with columns:
 
-**format_by_cluster()** returns columns:
+<details>
+<summary><strong>format_by_cluster columns</strong></summary>
 
 - online_group_name - online group name
 
@@ -97,11 +98,16 @@ format_by_text() and format_by_cluster(), both return pandas DataFrames that are
 
 - all_sentiments - this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
+</details>
+
 example to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_2.csv)
 
-**format_by_text()** returns columns:
+**format_by_text()** returns pandas DataFrame with columns:
+
+<details>
+<summary><strong>format_by_text columns</strong></summary>
 
 - online_group_name - online group name
 
@@ -113,6 +119,8 @@ example to showcase output format:
 
 - sentiment - dict item holding sentiment calculation, of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
+</details>
+
 example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
@@ -120,21 +128,28 @@ example output to showcase output format:
 ---
 ## Pipeline Architecture & API Overview
 
+**Pipeline:**
 ```txt
-CSV Text Data --> Embeddings --> Cluster --> Summarize  --> Formatting
+CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```
+**Functions:**
+get_embeddings(file_path, chunk_size=...)
+Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
 
-**Embeddings: get_embeddings()**
-Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
+cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)
+Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 
-**Cluster: cluster_embeddings()**
-Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering. 
+summarize_clusters(clustered_df, max_sample_size=...)
+Uses GPT (via Chat Completions) to label clusters and Hugging Face for sentiment analysis.
 
-**Summarize: summarize_cluster()**
-Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster.
+format_to_dict(summary_df)
+Returns structured output as a dictionary (ideal for JSON export).
 
-**Formatting: format_to_dict()**, **format_by_cluster()**, **format_by_text()**
-Formats summarized clusters into usable formats for analysis or export.
+format_by_cluster(summary_df)
+Returns a DataFrame where each row summarizes a cluster.
+
+format_by_text(summary_df)
+Returns a DataFrame where each row is an individual comment with its sentiment and cluster label.
 
 ### NarrativeMapper Class
 
