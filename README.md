@@ -1,6 +1,6 @@
 # NarrativeMapper
 
-### Overview:
+## Overview:
 
 The NarrativeMapper package is a discourse analysis pipeline that uncovers the dominant narratives and emotional tones within online communities.
 
@@ -15,7 +15,7 @@ For each discovered cluster, the tool:
 - Outputs structured summaries of the narrative + emotion pairs
 
 ---
-### Installation:
+## Installation:
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
@@ -24,7 +24,7 @@ pip install NarrativeMapper
 ```
 
 ---
-### Output Formats:
+## Output Formats:
 
 This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03). 
 
@@ -94,6 +94,8 @@ Two other formatting functions are available, format_by_text() and format_by_clu
 
 - aggregated_sentiment - net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
 
+- text - the list of textual messages that are part of the cluster
+
 - all_sentiments - this is a list containing dict items of the form '{'label': 'NEGATIVE', 'score': 0.9896971583366394}' for each message (sentiment calculated by distilbert-base-uncased-finetuned-sst-2-english).
 
 example to showcase output format:
@@ -116,8 +118,10 @@ example output to showcase output format:
 
 [click to view CSV](unrelated_to_package/example_outputs/test_1.csv)
 
+All three of these functions format the input DataFrame from the summarize_cluster() function.
+
 ---
-### Pipeline Architecture:
+## Pipeline Architecture & API Overview
 
 ```txt
 CSV Text Data --> Embeddings (embeddings.py) --> Cluster (clustering.py) --> Summarize (summarize.py)  --> Formatting (formatters.py)
@@ -125,18 +129,59 @@ CSV Text Data --> Embeddings (embeddings.py) --> Cluster (clustering.py) --> Sum
 
 **embeddings.py:**
 Converts textual messages into 3072 dimensional vectors (OPEN AI's text-embedding-3-large).
+Associated Functions: **get_embeddings()**
 
 **clustering.py:**
 Clusters embedding vectors using UMAP for reduction and HDBSCAN for clustering.
+Associated Functions: **cluster_embeddings()**
 
 **summarize.py:**
 Determines summaries/label-names (4o-gpt-mini Chat Completion) and sentiment (distilbert-base-uncased-finetuned-sst-2-english) for each cluster. 
+Associated Functions: **summarize_cluster()**
 
 **formatters.py:**
-Formats summarized clusters into useful forms for data analysis.
+Formats summarized clusters into usable formats for analysis or export.
+Associated Functions: **format_to_dict()**, **format_by_cluster()**, **format_by_text()**
+
+### NarrativeMapper Class:
+
+**Instance Attributes:**
+
+```python
+class NarrativeMapper:
+    def __init__(self, online_group_name: str):
+        self.online_group_name     # Name of the online community or data source
+        self.embeddings            # List of dicts with original text + 3072-dim embedding
+        self.cluster_df            # DataFrame after clustering
+        self.summary_df            # DataFrame after summarization
+
+```
+
+**Methods:**
+```python
+load_embeddings(file_path, chunk_size=500)
+cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+summarize(max_sample_size=500)
+format_by_text()
+format_by_cluster()
+format_to_dict()
+```
+
+### Parameter Reference:
+
+<details>
+<summary><strong>Click to expand</strong></summary>
+```txt
+- n_components: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
+- n_neighbors: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
+- min_cluster_size: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
+- min_samples: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
+- chunk_size (load_embeddings): Number of messages processed per API request to avoid token limits.
+- max_sample_size (summarize): Maximum number of comments sampled per cluster for summarization.
+</details>```
 
 ---
-### How to Use:
+## How to Use:
 
 **IMPORTANT:**
 
@@ -149,7 +194,6 @@ OPENAI_API_KEY="your-api-key-here"
 ```
 
 The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
-
 
 **Option 1: High-Level Class-Based Interface**
 
@@ -180,9 +224,9 @@ cluster_df.to_csv("cluster_summary.csv", index=False)
 
 ```python
 #manual control over each step:
-embeddings = get_embeddings("path/to/your/file.csv")
+embeddings = get_embeddings("path/to/your/file.csv", chunk_size=1000)
 cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
-summary_df = summarize_clusters(cluster_df)
+summary_df = summarize_clusters(cluster_df, max_sample_size=500)
 
 #export/format options
 summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")

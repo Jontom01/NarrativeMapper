@@ -20,9 +20,9 @@ def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
     for _, row in df.iterrows():
         comment_count.append(len(row['text']))
     df['comment_count'] = comment_count   
-    df = df.drop(columns=['text'])
     df['online_group_name'] = online_group_name
-    df = df[['online_group_name', 'cluster', 'cluster_summary', 'comment_count', 'aggregated_sentiment', 'all_sentiments']]
+    df = df[['online_group_name', 'cluster', 'cluster_summary', 'comment_count', 'aggregated_sentiment', 'text', 'all_sentiments']]
+    
     return df
 
 def format_by_text(df, online_group_name="") -> pd.DataFrame:
