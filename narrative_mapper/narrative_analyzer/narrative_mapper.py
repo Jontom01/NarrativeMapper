@@ -39,8 +39,15 @@ class NarrativeMapper:
         self.embeddings = get_embeddings(file_path, chunk_size)
         return self
 
-    def cluster(self, n_components: int = 20, n_neighbors: int = 20,
-                min_cluster_size: int = 40, min_samples: int = 15) -> "NarrativeMapper":
+    def cluster(
+        self, 
+        n_components: int=20, 
+        n_neighbors: int=20,
+        min_cluster_size: int=40, 
+        min_samples: int=15,
+        umap_kwargs=None,
+        hdbscan_kwargs=None
+        ) -> "NarrativeMapper":
         """
         Applies UMAP for dimensionality reduction and HDBSCAN for clustering
         on the loaded embeddings.
@@ -59,7 +66,9 @@ class NarrativeMapper:
             n_components=n_components,
             n_neighbors=n_neighbors,
             min_cluster_size=min_cluster_size,
-            min_samples=min_samples
+            min_samples=min_samples,
+            umap_kwargs=umap_kwargs,
+            hdbscan_kwargs=hdbscan_kwargs
         )
         return self
 

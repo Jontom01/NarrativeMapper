@@ -11,7 +11,7 @@ NarrativeMapper is a discourse analysis tool that extracts dominant narratives a
 
 - Density-based clustering ([HDBSCAN](https://hdbscan.readthedocs.io/en/latest/))
 
-- Topic Summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
+- Topic summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
 
 
 ## Installation and Setup
@@ -43,7 +43,7 @@ This example is based off of 1800 r/antiwork comments from the top 300 posts wit
 
 The three formatter functions return the following:
 
-**format_to_dict()** returns dict, useful for JSON export.
+**format_to_dict()** returns dict with following format:
 
 ```json
 {
@@ -198,9 +198,9 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 get_embeddings(file_path, chunk_size=...)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
-cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=...)
+cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=..., umap_kwargs=..., hdbscan_kwags=...)
 
-#Uses GPT (via Chat Completions) to label clusters and Hugging Face for sentiment analysis.
+#Uses GPT (via Chat Completions) for cluster summaries and Hugging Face for sentiment analysis.
 summarize_clusters(clustered_df, max_sample_size=...)
 
 #Returns structured output as a dictionary (ideal for JSON export).
@@ -229,9 +229,9 @@ class NarrativeMapper:
 
 **Methods:**
 ```python
-load_embeddings(file_path, chunk_size=500)
-cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
-summarize(max_sample_size=500)
+load_embeddings(file_path, chunk_size=...)
+cluster(n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=..., umap_kwargs=..., hdbscan_kwargs=...)
+summarize(max_sample_size=...)
 format_by_text()
 format_by_cluster()
 format_to_dict()
@@ -242,17 +242,21 @@ format_to_dict()
 <details>
 <summary><strong>Click to expand</strong></summary>
 
-- **n_components**: The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
+- **n_components:** The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
 
-- **n_neighbors**: Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
+- **n_neighbors:** Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
 
-- **min_cluster_size**: In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
+- **min_cluster_size:** In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
 
-- **min_samples**: A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
+- **min_samples:** A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
 
-- **chunk_size** *(load_embeddings)*: Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
+- **umap_kwargs:** Allows for input of other UMAP parameters.
 
-- **max_sample_size** *(summarize)*: Maximum number of comments sampled per cluster for summarization.
+- **hdbscan_kwags:** Allows for input of other HDBSCAN parameters.
+
+- **chunk_size:** Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
+
+- **max_sample_size:** Maximum number of comments sampled per cluster for summarization.
 
 </details>
 

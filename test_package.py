@@ -29,7 +29,10 @@ if __name__ == "__main__":
     mapper = NarrativeMapper("r/antiwork")
 
     mapper.load_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv", chunk_size=1000)
-    mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=80, min_samples=15)
+
+    umap_kwargs =  {'min_dist': 0.1, 'random_state': 42}
+    mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=80, min_samples=15, umap_kwargs=umap_kwargs)
+
     mapper.summarize(max_sample_size=600)
 
     df_text = mapper.format_by_text()
