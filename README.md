@@ -198,7 +198,15 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 get_embeddings(file_path, chunk_size=...)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
-cluster_embeddings(embeddings, n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=..., umap_kwargs=..., hdbscan_kwags=...)
+cluster_embeddings(
+    embeddings, 
+    n_components=..., 
+    n_neighbors=..., 
+    min_cluster_size=..., 
+    min_samples=..., 
+    umap_kwargs=..., 
+    hdbscan_kwags=...
+    )
 
 #Uses GPT (via Chat Completions) for cluster summaries and Hugging Face for sentiment analysis.
 summarize_clusters(clustered_df, max_sample_size=...)
@@ -230,7 +238,14 @@ class NarrativeMapper:
 **Methods:**
 ```python
 load_embeddings(file_path, chunk_size=...)
-cluster(n_components=..., n_neighbors=..., min_cluster_size=..., min_samples=..., umap_kwargs=..., hdbscan_kwargs=...)
+cluster(
+    n_components=..., 
+    n_neighbors=..., 
+    min_cluster_size=..., 
+    min_samples=..., 
+    umap_kwargs=..., 
+    hdbscan_kwargs=...
+    )
 summarize(max_sample_size=...)
 format_by_text()
 format_by_cluster()
