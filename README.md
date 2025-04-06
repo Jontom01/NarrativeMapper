@@ -285,9 +285,9 @@ Example: A CSV containing 1,000 Reddit comments costs approximately **$0.01** to
 <details>
 <summary><strong>Click for pricing details</strong></summary>
 
-The OpenAI text-embedding-3-large model costs approximately $13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
+The OpenAI text-embedding-3-large model costs approximately $0.13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
 
-The Chat Completions model used for summarization (gpt-4o-mini) is $15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
+The Chat Completions model used for summarization (gpt-4o-mini) is $0.15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
 
 The gpt-4o-mini input prompt (excluding the text) and output summary are both very short (<100 tokens), so their cost contribution is negligible.
 
