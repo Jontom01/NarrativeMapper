@@ -27,7 +27,7 @@ class NarrativeMapper:
         self.cluster_df = None
         self.summary_df = None
 
-    def load_embeddings(self, batch_size: int=500) -> "NarrativeMapper":
+    def load_embeddings(self, batch_size: int=50) -> "NarrativeMapper":
         """
         Loads and processes text data to obtain OpenAI embeddings.
         

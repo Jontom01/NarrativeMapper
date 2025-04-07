@@ -5,3 +5,4 @@ notes.txt
 dist/
 build/
 *.egg-info/
+test_package.py

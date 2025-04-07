@@ -152,7 +152,7 @@ file_df = pd.read_csv("file-path")
 mapper = NarrativeMapper(file_df, "r/antiwork")
 
 #embeds semantic vectors
-mapper.load_embeddings(batch_size=1000)
+mapper.load_embeddings(batch_size=100)
 
 #clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
 mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
@@ -179,7 +179,7 @@ import pandas as pd
 df = pd.read_csv("file-path")
 
 #manual control over each step:
-embeddings = get_embeddings(file_df, batch_size=1000)
+embeddings = get_embeddings(file_df, batch_size=100)
 cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
 summary_df = summarize_clusters(cluster_df, max_sample_size=500)
 

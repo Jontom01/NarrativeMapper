@@ -21,7 +21,7 @@ def clean_texts(text_list: list[str]):
         text = re.sub(r'<.*?>', '', text)
     return text_list
 
-def get_embeddings(df, batch_size: int=500) -> pd.DataFrame:
+def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
     """
     Generates OpenAI text embeddings.
 
