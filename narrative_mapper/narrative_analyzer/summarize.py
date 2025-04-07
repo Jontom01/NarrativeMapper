@@ -1,12 +1,9 @@
-import pandas as pd
 from transformers import pipeline
-from dotenv import load_dotenv
 from openai import OpenAI
-import os 
+from .openai_utils import get_openai_key
+import pandas as pd
 
-load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=get_openai_key())
 
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 

@@ -1,14 +1,11 @@
 from openai import OpenAI
-import pandas as pd
-from dotenv import load_dotenv
-import os
 from sklearn.preprocessing import normalize
+from .openai_utils import get_openai_key
+import pandas as pd
 import tiktoken
 import re
 
-load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=get_openai_key())
 
 def batch_list(big_list, batch_size=500):
     return [big_list[i:i + batch_size] for i in range(0, len(big_list), batch_size)]

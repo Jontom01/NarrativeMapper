@@ -34,7 +34,16 @@ pip install NarrativeMapper
 OPENAI_API_KEY="your-api-key-here"
 ```
 
-The package will automatically load your key using python-dotenv. (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
+3. Before importing narrative_mapper, make sure to load your.env like this:
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+
+from narrative_mapper import *
+```
+
+(Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
 
 
 ## Output Formats
@@ -143,6 +152,9 @@ The three formatter functions return the following:
 **Option 1: High-Level Class-Based Interface**
 
 ```python
+from dotenv import load_dotenv
+load_dotenv()
+
 from narrative_mapper import *
 import pandas as pd
 
@@ -173,6 +185,9 @@ cluster_df.to_csv("cluster_summary.csv", index=False)
 **Option 2: Low-Level Functional Interface**
 
 ```python
+from dotenv import load_dotenv
+load_dotenv()
+
 from narrative_mapper import *
 import pandas as pd
 

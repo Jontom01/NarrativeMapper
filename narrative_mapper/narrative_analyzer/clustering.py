@@ -1,6 +1,6 @@
+from sklearn.metrics.pairwise import pairwise_distances
 import umap.umap_ as umap
 import hdbscan
-from sklearn.metrics.pairwise import pairwise_distances
 import pandas as pd
 
 def cluster_embeddings(
