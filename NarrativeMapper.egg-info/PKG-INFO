@@ -1,3 +1,22 @@
+Metadata-Version: 2.4
+Name: NarrativeMapper
+Version: 0.1.9
+Summary: NarrativeMapper is a text analysis pipeline that uncovers the dominant narratives and emotional tones within online communities.
+Author-email: jontom01 <jonnyy.thompson@gmail.com>
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas
+Requires-Dist: openai
+Requires-Dist: umap-learn
+Requires-Dist: hdbscan
+Requires-Dist: scikit-learn
+Requires-Dist: python-dotenv
+Requires-Dist: transformers
+Requires-Dist: tiktoken
+Dynamic: license-file
+
 # NarrativeMapper
 
 
@@ -45,64 +64,6 @@ from narrative_mapper import *
 
 (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
 
-
-## How to Use
-
-**Option 1: Class-Based Interface**
-
-```python
-from dotenv import load_dotenv
-load_dotenv()
-
-from narrative_mapper import *
-import pandas as pd
-
-file_df = pd.read_csv("file-path")
-
-#initialize NarrativeMapper object
-mapper = NarrativeMapper(file_df, "r/antiwork")
-
-#embeds semantic vectors
-mapper.load_embeddings(batch_size=100)
-
-#clustering: main UMAP and HDBSCAN variables along with kwargs for more customizability.
-umap_kwargs =  {'min_dist': 0.0}
-mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, umpa_kwargs=umap_kwargs)
-
-#summarize each cluster's topic and sentiment
-mapper.summarize(max_sample_size=500)
-
-#export in your preferred format
-summary_dict = mapper.format_to_dict()
-text_df = mapper.format_by_text()
-cluster_df = mapper.format_by_cluster()
-
-#saving DataFrames to csv
-text_df.to_csv("comments_by_cluster.csv", index=False)
-cluster_df.to_csv("cluster_summary.csv", index=False)
-```
-
-**Option 2: Functional Interface**
-
-```python
-from dotenv import load_dotenv
-load_dotenv()
-
-from narrative_mapper import *
-import pandas as pd
-
-df = pd.read_csv("file-path")
-
-#manual control over each step:
-embeddings = get_embeddings(file_df, batch_size=100)
-cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
-summary_df = summarize_clusters(cluster_df, max_sample_size=500)
-
-#export/format options
-summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
-text_df = format_by_text(summary_df, online_group_name="r/antiwork")
-cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
-```
 
 ## Output Formats
 
@@ -204,6 +165,63 @@ The three formatter functions return the following:
 
 [CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_1.csv)
 
+
+## How to Use
+
+**Option 1: High-Level Class-Based Interface**
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+
+from narrative_mapper import *
+import pandas as pd
+
+file_df = pd.read_csv("file-path")
+
+#initialize NarrativeMapper object
+mapper = NarrativeMapper(file_df, "r/antiwork")
+
+#embeds semantic vectors
+mapper.load_embeddings(batch_size=100)
+
+#clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
+mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+
+#summarize each cluster's topic and sentiment
+mapper.summarize(max_sample_size=500)
+
+#export in your preferred format
+summary_dict = mapper.format_to_dict()
+text_df = mapper.format_by_text()
+cluster_df = mapper.format_by_cluster()
+
+#saving DataFrames to csv
+text_df.to_csv("comments_by_cluster.csv", index=False)
+cluster_df.to_csv("cluster_summary.csv", index=False)
+```
+
+**Option 2: Low-Level Functional Interface**
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+
+from narrative_mapper import *
+import pandas as pd
+
+df = pd.read_csv("file-path")
+
+#manual control over each step:
+embeddings = get_embeddings(file_df, batch_size=100)
+cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
+summary_df = summarize_clusters(cluster_df, max_sample_size=500)
+
+#export/format options
+summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
+text_df = format_by_text(summary_df, online_group_name="r/antiwork")
+cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
+```
 
 ## Pipeline Architecture & API Overview
 

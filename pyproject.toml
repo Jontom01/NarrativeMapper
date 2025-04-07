@@ -23,6 +23,3 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["narrative_mapper*"]
-
-[tool.setuptools.exlclude]
-exclude = ["dev", "unrelated_to_package"]
