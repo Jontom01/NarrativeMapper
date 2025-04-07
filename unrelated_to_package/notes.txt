@@ -1,0 +1,149 @@
+- Have to document functions
+- check for sentiment classifier accuracy
+- cleaner way to have subreddit in final data
+- Now that I have a functioning prototype, I will use narrative mapper to analyze narrative trends overtime, or narrative differences between groups.
+- I can potentially turn this into an actual package
+- deal with "Using a pipeline without specifying a model name and revision in production is not recommended." before publishing package
+
+{
+    'subreddit': 'politics',
+    'clusters': [
+        {
+            'label': [
+                'trump appear hispanic',
+                'trump instinct racist',
+                'trump told rally'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 500
+        },
+        {
+            'label': [
+                'bannon putin messages',
+                'putin focus groups',
+                'analytica steve bannon'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 101
+        },
+        {
+            'label': [
+                'hilarious offended republicans',
+                'offended republicans',
+                'insulting republicans'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 74
+        },
+        {
+            'label': [
+                'federal abortion',
+                'federal abortion clinics',
+                'treatment include abortions'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 102
+        },
+        {
+            'label': [
+                'vance candidate eventually',
+                'walz announced vance',
+                'vance candidate'
+            ],
+            'tone': 'NEUTRAL',
+            'comment_count': 64
+        },
+        {
+            'label': [
+                'facing harris trump',
+                'trump challenging harris',
+                'trump debate week'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 120
+        },
+        {
+            'label': [
+                'polling shows trump',
+                'recent polling wisconsin',
+                'trump michigan polling'
+            ],
+            'tone': 'NEUTRAL',
+            'comment_count': 119
+        }
+    ]
+}
+
+
+{
+    'online_group_name': 'r/conservative',
+    'clusters': [
+        {
+            'label': [
+                'internet left wingers',
+                'hollywood folks liberal',
+                'liberal hollywood'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 500
+        },
+        {
+            'label': [
+                'homeless veterans funds',
+                'assist homeless veterans',
+                'homeless veterans'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 54
+        },
+        {
+            'label': [
+                'eat india bacon',
+                'india bacon proof',
+                'india bacon'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 278
+        },
+        {
+            'label': [
+                'invading conservative forums',
+                'conservative forums',
+                'reddit cnn conservative'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 59
+        },
+        {
+            'label': [
+                'man looking christian',
+                'man golden casket',
+                'golden casket man'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 79
+        },
+        {
+            'label': [
+                'biden inability talk',
+                'biden conspiracy bit',
+                'dead biden conspiracy'
+            ],
+            'tone': 'NEUTRAL',
+            'comment_count': 55
+        },
+        {
+            'label': [
+                'mccain campaigns hostility',
+                'romney mccain campaigns',
+                'romney mccain'
+            ],
+            'tone': 'NEGATIVE',
+            'comment_count': 154
+        }
+    ]
+}
+
+
+online_group_name, cluster_label, sentiment, comment_count
+   str                list[str]      str        int
