@@ -144,12 +144,15 @@ The three formatter functions return the following:
 
 ```python
 from narrative_mapper import *
+import pandas as pd
+
+file_df = pd.read_csv("file-path")
 
 #initialize NarrativeMapper object
-mapper = NarrativeMapper("r/antiwork")
+mapper = NarrativeMapper(file_df, "r/antiwork")
 
 #embeds semantic vectors
-mapper.load_embeddings("path/to/your/file.csv", chunk_size=1000)
+mapper.load_embeddings(batch_size=1000)
 
 #clustering: n_components, n_neighbors are UMAP variables. min_cluser_size, min_samples are HDBSCAN variables.
 mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
@@ -171,9 +174,12 @@ cluster_df.to_csv("cluster_summary.csv", index=False)
 
 ```python
 from narrative_mapper import *
+import pandas as pd
+
+df = pd.read_csv("file-path")
 
 #manual control over each step:
-embeddings = get_embeddings("path/to/your/file.csv", chunk_size=1000)
+embeddings = get_embeddings(file_df, batch_size=1000)
 cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
 summary_df = summarize_clusters(cluster_df, max_sample_size=500)
 
@@ -195,7 +201,7 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```python
 
 #Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
-get_embeddings(file_path, chunk_size=...)
+get_embeddings(file_df, batch_size=...)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 cluster_embeddings(
@@ -227,7 +233,8 @@ format_by_text(summary_df)
 
 ```python
 class NarrativeMapper:
-    def __init__(self, online_group_name: str):
+    def __init__(self, df, online_group_name: str):
+        self.file_df               # DataFrame of csv file
         self.online_group_name     # Name of the online community or data source
         self.embeddings_df         # DataFrame after embedding
         self.cluster_df            # DataFrame after clustering
@@ -237,7 +244,7 @@ class NarrativeMapper:
 
 **Methods:**
 ```python
-load_embeddings(file_path, chunk_size=...)
+load_embeddings(batch_size=...)
 cluster(
     n_components=..., 
     n_neighbors=..., 
@@ -269,7 +276,7 @@ format_to_dict()
 
 - **hdbscan_kwags:** Allows for input of other HDBSCAN parameters.
 
-- **chunk_size:** Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
+- **batch_size:** Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
 
 - **max_sample_size:** Maximum number of comments sampled per cluster for summarization.
 

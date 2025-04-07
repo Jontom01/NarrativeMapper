@@ -1,10 +1,13 @@
 from narrative_mapper import *
+import pandas as pd
 
 if __name__ == "__main__":
     #Function Use Version
     
     '''
-    embeddings_dict = get_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv")
+    file_df = pd.read_csv("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv")
+
+    embeddings_dict = get_embeddings(file_df)
 
     df = cluster_embeddings(embeddings_dict, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
 
@@ -24,9 +27,10 @@ if __name__ == "__main__":
     '''
     #OO Version
     
-    mapper = NarrativeMapper("r/antiwork")
+    df = pd.read_csv("unrelated_to_package/comment_data/comment_data_politics_1200.csv")
 
-    mapper.load_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv", chunk_size=500)
+    mapper = NarrativeMapper(df, "r/politics")
+    mapper.load_embeddings(batch_size=250)
 
     umap_kwargs =  {'min_dist': 0.0}
     mapper.cluster(n_components=15, n_neighbors=15, min_cluster_size=70, min_samples=20, umap_kwargs=umap_kwargs)
@@ -36,7 +40,7 @@ if __name__ == "__main__":
     df_cluster = mapper.format_by_cluster()
     dict_output = mapper.format_to_dict()
 
-    df_text.to_csv("test_1.csv", index=False)
-    df_cluster.to_csv("test_2.csv", index=False)
+    #df_text.to_csv("test_1.csv", index=False)
+    #df_cluster.to_csv("test_2.csv", index=False)
 
     print(dict_output)

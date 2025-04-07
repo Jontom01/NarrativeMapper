@@ -13,30 +13,31 @@ class NarrativeMapper:
     and format the results into various output structures.
     """
     
-    def __init__(self, online_group_name: str):
+    def __init__(self, df, online_group_name: str):
         """
         Initializes the NarrativeMapper instance.
         
         Parameters:
             online_group_name (str): Name of the online community (e.g. subreddit) to label outputs.
+            df (DataFrame): The DataFrame of the original file.
         """
+        self.file_df = df
         self.online_group_name = online_group_name
         self.embeddings_df = None
         self.cluster_df = None
         self.summary_df = None
 
-    def load_embeddings(self, file_path: str, chunk_size: int=500) -> "NarrativeMapper":
+    def load_embeddings(self, batch_size: int=500) -> "NarrativeMapper":
         """
         Loads and processes text data to obtain OpenAI embeddings.
         
         Parameters:
-            file_path (str): Path to the .csv file containing text data.
-            chunk_size (int): length of text-list chunks being send to OpenAI embeddings
+            batch_size (int): length of text-list chunks being send to OpenAI embeddings
         
         Returns:
             NarrativeMapper: Self, with embeddings loaded.
         """
-        self.embeddings_df = get_embeddings(file_path, chunk_size)
+        self.embeddings_df = get_embeddings(self.file_df, batch_size)
         return self
 
     def cluster(
