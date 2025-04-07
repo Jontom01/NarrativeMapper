@@ -1,5 +1,4 @@
 from openai import OpenAI
-import ast
 import pandas as pd
 from dotenv import load_dotenv
 import os
@@ -12,57 +11,40 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def chunk_list(big_list, chunk_size=500):
     return [big_list[i:i + chunk_size] for i in range(0, len(big_list), chunk_size)]
 
-def get_embeddings(file_name: str, chunk_size: int=500) -> list[dict]:
+def get_embeddings(file_name: str, chunk_size: int=500) -> pd.DataFrame:
     """
-    Retrieves OpenAI embeddings for a large list of text entries by chunking the input to stay within token limits.
+    Generates OpenAI text embeddings.
 
-    Each dictionary must contain a 'text' field. The function processes the data in chunks using 
-    `get_embeddings_requests` and returns the full list with an added 'embedding_vector' key in each item.
-
-    Parameters:
-        file_name (str): Path to .csv file containing the input data.
-        chunk_size (int): length of text-list chunks being send to OpenAI embeddings
-
-    Returns:
-        list of dict: Same dictionaries with added 'embedding_vector' key.
-    """
-    text_list = []
-    with open(file_name, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        text_list = list(reader)
-
-    text_list_2d = chunk_list(text_list, chunk_size) #this chunks the list of texts dicts into chunk_size by N 2D list. This lets us batch call Open AI embeddings
-    embedding_dict = [] #this will hold a list of all the text dict items after they have added 'embedded_vector'
-    for comment_list in text_list_2d:
-        embedding_dict_tmp = get_embeddings_requests(comment_list) #the text list with embeddings for just 1 row of the 2D 500 by N list
-        embedding_dict += embedding_dict_tmp #add these dict items to the total embedding dict list
-    return embedding_dict
-
-def get_embeddings_requests(d: list[dict]) -> list[dict]:
-    """
-    Generates OpenAI embeddings for a list of dictionary items containing text data.
-
-    Each input dictionary must contain a 'text' key with a string value. The function sends
-    each 'text' value to the OpenAI embedding API and appends a new key called 'embedding_vector'
-    containing the 3072-dimensional semantic embedding.
+    The input csv file must contain 'text' column. The function sends
+    each 'text' value to the OpenAI embedding API in batches and then adds a new 'embeddings' 
+    column to output DataFrame containing the 3072-dimensional semantic embedding.
 
     Parameters:
         data (list of dict): A list of dictionaries, each representing a row of data.
                              Each dictionary must include a 'text' field.
 
     Returns:
-        list of dict: The same list of dictionaries, but with each dictionary now including
-                      an 'embedding_vector' key containing the embedding as a list of floats.
+        DataFrame: contains origin columns in file_name, but with the added 'embeddings' column
     """
-    text_list = []
-    for item in d:
-        text_list.append(item['text'])
-    response = client.embeddings.create(
-        input=text_list,
-        model="text-embedding-3-large"
-    )
-   
-    for i in range(len(response.data)):
-        d[i]['embedding_vector'] = response.data[i].embedding
+    #make try catch to see if text exists
+    df = pd.read_csv(file_name)
+    try:
+        text_list = df['text'].tolist()
+    except Exception as e:
+        print("Error converting text column to list")
+        raise e
 
-    return d
+    embeddings_list = []
+    batch_list = chunk_list(text_list, chunk_size) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
+
+    for batch in batch_list:
+        response = client.embeddings.create(
+            input=batch,
+            model="text-embedding-3-large"
+        )
+        for item in response.data:
+            embeddings_list.append(item.embedding)
+
+    df['embeddings'] = embeddings_list
+
+    return df

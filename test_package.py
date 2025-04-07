@@ -1,7 +1,5 @@
 from narrative_mapper import *
 
-#PACKAGE TEST USE
-
 if __name__ == "__main__":
     #Function Use Version
     
@@ -30,11 +28,10 @@ if __name__ == "__main__":
 
     mapper.load_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv", chunk_size=1000)
 
-    umap_kwargs =  {'min_dist': 0.1, 'random_state': 42}
-    mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=80, min_samples=15, umap_kwargs=umap_kwargs)
-
+    umap_kwargs =  {'min_dist': 0.0}
+    mapper.cluster(n_components=15, n_neighbors=15, min_cluster_size=70, min_samples=20, umap_kwargs=umap_kwargs)
     mapper.summarize(max_sample_size=600)
-
+    
     df_text = mapper.format_by_text()
     df_cluster = mapper.format_by_cluster()
     dict_output = mapper.format_to_dict()
@@ -43,4 +40,3 @@ if __name__ == "__main__":
     df_cluster.to_csv("test_2.csv", index=False)
 
     print(dict_output)
-

@@ -21,7 +21,7 @@ class NarrativeMapper:
             online_group_name (str): Name of the online community (e.g. subreddit) to label outputs.
         """
         self.online_group_name = online_group_name
-        self.embeddings = None
+        self.embeddings_df = None
         self.cluster_df = None
         self.summary_df = None
 
@@ -36,7 +36,7 @@ class NarrativeMapper:
         Returns:
             NarrativeMapper: Self, with embeddings loaded.
         """
-        self.embeddings = get_embeddings(file_path, chunk_size)
+        self.embeddings_df = get_embeddings(file_path, chunk_size)
         return self
 
     def cluster(
@@ -62,7 +62,7 @@ class NarrativeMapper:
             NarrativeMapper: Self, with clustering results stored.
         """
         self.cluster_df = cluster_embeddings(
-            self.embeddings,
+            self.embeddings_df,
             n_components=n_components,
             n_neighbors=n_neighbors,
             min_cluster_size=min_cluster_size,

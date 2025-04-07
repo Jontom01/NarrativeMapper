@@ -14,7 +14,6 @@ def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
     Returns:
         pd.DataFrame: Cluster-level summary with one row per cluster.
     """
-
     df = df.copy()
     comment_count = []
     for _, row in df.iterrows():
@@ -40,40 +39,33 @@ def format_by_text(df, online_group_name="") -> pd.DataFrame:
     """
 
     #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
-    df = df.copy()
-    rows = []
+    text_col = []
+    sentiment_col = []
+    online_group_name_col = []
+    cluster_col = []
+    cluster_summary_col = []
+
     for _, row in df.iterrows():
+        texts = row['text']
 
-        cluster_summary = row["cluster_summary"]
+        sentiments = row['all_sentiments']
 
-        text_list = row['text']
-        if isinstance(text_list, str):
-            try:
-                text_list = ast.literal_eval(text_list)
-            except Exception as e:
-                print("Error evaluating row['text']:", text_list)
-                raise e
+        text_col += texts
+        sentiment_col += sentiments
 
-        sentiment_list = row['all_sentiments']
-        if isinstance(sentiment_list, str):
-            try:
-                sentiment_list = ast.literal_eval(sentiment_list)
-            except Exception as e:
-                print("Error evaluating row['all_sentiments']:", sentiment_list)
-                raise e
-        cluster = row['cluster']
-        for index, message in enumerate(text_list): #did enumerate so i can index sentiment_list
-            tmp_dict = {
-                'online_group_name': online_group_name,
-                'cluster': cluster, 
-                'cluster_summary': cluster_summary,
-                'text': message, 
-                'sentiment': sentiment_list[index], 
-                }
-            rows.append(tmp_dict)
+        tmp = len(texts) #since these columns need to match the length of the others
+        online_group_name_col += [online_group_name] * tmp
+        cluster_col += [row['cluster']] * tmp
+        cluster_summary_col += [row['cluster_summary']] * tmp
 
-    formatted_df = pd.DataFrame(rows)
-    return formatted_df
+    return_df = pd.DataFrame({
+        'online_group_name': online_group_name_col, 
+        'cluster': cluster_col, 
+        'cluster_summary': cluster_summary_col,
+        'text': text_col,
+        'sentiment': sentiment_col})
+
+    return return_df
 
 def format_to_dict(df, online_group_name="") -> dict:
     """

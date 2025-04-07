@@ -229,7 +229,7 @@ format_by_text(summary_df)
 class NarrativeMapper:
     def __init__(self, online_group_name: str):
         self.online_group_name     # Name of the online community or data source
-        self.embeddings            # List of dicts with original text + 3072-dim embedding
+        self.embeddings_df            # DataFrame after embedding
         self.cluster_df            # DataFrame after clustering
         self.summary_df            # DataFrame after summarization
 

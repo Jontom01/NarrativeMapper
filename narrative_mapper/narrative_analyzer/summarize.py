@@ -1,10 +1,8 @@
 import pandas as pd
 from transformers import pipeline
-import ast
 from dotenv import load_dotenv
 from openai import OpenAI
 import os 
-import csv
 
 load_dotenv()
 
@@ -61,7 +59,6 @@ def extract_keywords_for_cluster(texts) -> str:
     return str(response.choices[0].message.content)
 
 def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFrame:
-
     """
     Summarizes each text cluster by extracting the narrative and sentiment analysis of each cluster.
 
@@ -82,8 +79,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFra
             - 'aggregated_sentiment': Overall sentiment label
             - 'all_sentiments': List of individual sentiment results per text
     """
-    df = df[df['cluster'] != -1]
-    df = df.drop(columns=['embedding_vector'])
+    df = df.drop(columns=['embeddings'])
     #group texts by cluster and sample up to 500 texts per cluster
     grouped_texts = {}
     grouped = df.groupby('cluster')
