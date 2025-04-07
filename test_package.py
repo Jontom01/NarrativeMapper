@@ -26,7 +26,7 @@ if __name__ == "__main__":
     
     mapper = NarrativeMapper("r/antiwork")
 
-    mapper.load_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv", chunk_size=1000)
+    mapper.load_embeddings("unrelated_to_package/comment_data/comment_data_antiwork_1800.csv", chunk_size=500)
 
     umap_kwargs =  {'min_dist': 0.0}
     mapper.cluster(n_components=15, n_neighbors=15, min_cluster_size=70, min_samples=20, umap_kwargs=umap_kwargs)

@@ -3,6 +3,8 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import csv
+from sklearn.preprocessing import normalize
+import tiktoken
 
 load_dotenv()
 
@@ -36,8 +38,12 @@ def get_embeddings(file_name: str, chunk_size: int=500) -> pd.DataFrame:
 
     embeddings_list = []
     batch_list = chunk_list(text_list, chunk_size) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
-
+    encoding = tiktoken.encoding_for_model("text-embedding-3-large")
     for batch in batch_list:
+        tokens = encoding.encode(str(batch))
+        if len(tokens) > 8191 + 2: #the extra 2 is because of the '[]' that wont be passed into the actual model
+            print("A batch exceeded token limit. Decrease chunk_size parameter value.")
+
         response = client.embeddings.create(
             input=batch,
             model="text-embedding-3-large"
@@ -45,6 +51,7 @@ def get_embeddings(file_name: str, chunk_size: int=500) -> pd.DataFrame:
         for item in response.data:
             embeddings_list.append(item.embedding)
 
-    df['embeddings'] = embeddings_list
+    normalize_embeddings = normalize(embeddings_list, norm='l2') #since both UMAP + HDBSCAN are setup for cosine similarity
+    df['embeddings'] = normalize_embeddings.tolist()
 
     return df
