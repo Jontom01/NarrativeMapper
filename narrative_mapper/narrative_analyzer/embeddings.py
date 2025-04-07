@@ -48,8 +48,9 @@ def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
     encoding = tiktoken.encoding_for_model("text-embedding-3-large")
     for batch in batches:
         batch = clean_texts(batch) #clean text input
-        tokens = encoding.encode(str(batch))
-        if len(tokens) > 8191 + 2: #the extra 2 is because of the '[]' that wont be passed into the actual model
+        total_tokens = sum(len(encoding.encode(message)) for message in batch)
+
+        if total_tokens > 8191:
             print("A batch exceeded token limit. Decrease batch_size parameter value.")
 
         response = client.embeddings.create(
