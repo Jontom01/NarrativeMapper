@@ -34,7 +34,7 @@ pip install NarrativeMapper
 OPENAI_API_KEY="your-api-key-here"
 ```
 
-3. Before importing narrative_mapper, make sure to load your.env like this:
+3. Before importing narrative_mapper, make sure to load your .env like this:
 
 ```python
 from dotenv import load_dotenv
