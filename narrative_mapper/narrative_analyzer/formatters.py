@@ -1,5 +1,4 @@
 import pandas as pd
-import ast
 
 def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
     """

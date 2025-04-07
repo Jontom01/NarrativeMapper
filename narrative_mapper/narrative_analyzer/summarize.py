@@ -79,6 +79,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFra
             - 'aggregated_sentiment': Overall sentiment label
             - 'all_sentiments': List of individual sentiment results per text
     """
+    df = df.copy()
     df = df.drop(columns=['embeddings'])
     #group texts by cluster and sample up to 500 texts per cluster
     grouped_texts = {}

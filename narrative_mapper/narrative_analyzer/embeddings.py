@@ -35,6 +35,7 @@ def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
     Returns:
         DataFrame: contains origin columns in file_name, but with the added 'embeddings' column
     """
+    df = df.copy()
     #make try catch to see if text exists
     try:
         text_list = df['text'].tolist()
