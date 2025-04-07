@@ -1,8 +1,0 @@
-pandas
-openai
-umap-learn
-hdbscan
-scikit-learn
-python-dotenv
-transformers
-tiktoken
