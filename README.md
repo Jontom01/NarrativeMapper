@@ -63,7 +63,7 @@ from narrative_mapper import *
 
 ## How to Use
 
-**Option 1: CLI (zero code)**
+### Option 1: CLI (zero code)
 
 Run NarrativeMapper directly from the terminal:
 
@@ -80,7 +80,9 @@ This will:
 
 - Print the summarized narratives and sentiment to the terminal
 
-**Option 1: Class-Based Interface**
+**Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
+
+### Option 2: Class-Based Interface
 
 ```python
 from dotenv import load_dotenv
@@ -114,7 +116,7 @@ text_df.to_csv("comments_by_cluster.csv", index=False)
 cluster_df.to_csv("cluster_summary.csv", index=False)
 ```
 
-**Option 2: Functional Interface**
+### Option 3: Functional Interface
 
 ```python
 from dotenv import load_dotenv
