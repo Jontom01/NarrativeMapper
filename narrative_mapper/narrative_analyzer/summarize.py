@@ -3,10 +3,13 @@ from openai import OpenAI
 from .openai_utils import get_openai_key
 from rich.progress import Progress
 import pandas as pd
+import torch
 
 client = OpenAI(api_key=get_openai_key())
 
-sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+
+device= 0 if torch.cuda.is_available() else -1
+sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
 
 def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
     """

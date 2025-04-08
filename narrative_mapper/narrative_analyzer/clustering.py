@@ -63,8 +63,5 @@ def cluster_embeddings(
     df = df.copy()
     df['cluster'] = cluster_labels.tolist()
     df = df[df['cluster'] != -1]
-    #tells users how many clusters were found using their setup
-    num_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
-    print(f"HDBSCAN found {num_clusters} clusters.")
 
     return df
