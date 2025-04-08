@@ -19,7 +19,7 @@ import tiktoken
 import csv
 import pandas as pd
 
-#can add a facebook scraper, give user the option, depending on which they choose i iwll only THEN import the file (this makes it so the program can run if the user only has a reddit api key but not facebook but chooses reddit, for example).
+#better cluster param calculations, flag options (sample size limiter, batch_size, output file directory)
 def calculate_token_stats(text_list, model="text-embedding-3-large"):
     """
     Calculates average and total tokens for a list of messages.
@@ -89,7 +89,8 @@ def main():
     output = mapper.summarize().format_to_dict()["clusters"]
 
     with open(f"{args.online_group_name}_NarrativeMapper.txt", "w", encoding="utf-8") as f:
-        f.write(f"Run Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        f.write(f"Run Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"Online Group Name: {args.online_group_name}\n\n")
 
     logging.basicConfig(
         level=logging.INFO,

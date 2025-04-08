@@ -33,20 +33,25 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 
 **Installation:**
 
+<details>
+<summary><strong>Click to view installation process</strong></summary>
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
 ```bash
 pip install NarrativeMapper
 ```
+</details>
 
 **Setup:**
 
+<details>
+<summary><strong>Click to view setup process</strong></summary>
 1. Create a .env file in your root directory (same folder where your script runs).
 
 2. Inside the .env file, add your OpenAI API key like this:
 
 ```dotenv
-OPENAI_API_KEY="your-api-key-here"
+OPENAI_API_KEY=your-api-key-here
 ```
 
 3. Before importing narrative_mapper, make sure to load your .env like this:
@@ -59,7 +64,7 @@ from narrative_mapper import *
 ```
 
 (Make sure to keep your .env file private and add it to your .gitignore if you're using Git.)
-
+</details>
 
 ## How to Use
 
@@ -79,6 +84,43 @@ This will:
 - Output a formatted results file in the current directory (output_summary.txt)
 
 - Print the summarized narratives and sentiment to the terminal
+
+File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/comment_data/comment_data_space.csv):
+
+```txt
+Run Timestamp: 2025-04-08 19:12:45
+Online Group Name: reddit_space_subreddit
+
+Summary: The core themes of this cluster revolve around the awe and nostalgia associated with the Voyager missions, the challenges of long-term space exploration, and imaginative reflections on extraterrestrial life and science fiction.
+Sentiment: NEUTRAL
+Comments: 25
+---
+
+Summary: The core theme of this cluster revolves around discussions of space, galaxies, the universe's vastness, and the implications of astronomical phenomena on our understanding of life and existence.
+Sentiment: NEGATIVE
+Comments: 95
+---
+
+Summary: The cluster revolves around personal experiences and emotions related to witnessing solar eclipses and auroras, highlighting the awe, excitement, and challenges of viewing these celestial events.
+Sentiment: NEUTRAL
+Comments: 63
+---
+
+Summary: The core theme of this cluster revolves around admiration and appreciation for a stunning astronomical photograph, with many comments expressing curiosity about the techniques used to capture it and requests for high-resolution versions for personal use.
+Sentiment: POSITIVE
+Comments: 48
+---
+
+Summary: The cluster primarily discusses concerns and criticisms regarding Boeing's safety record, management practices, and the implications for NASA's reliance on Boeing for crewed space missions, juxtaposed with support for SpaceX's advancements in space travel.
+Sentiment: NEGATIVE
+Comments: 53
+---
+
+Summary: The cluster discusses concerns about space debris, the irresponsibility of space agencies, particularly China, and the need for international cooperation and regulation to address the growing problem of litter in Earth's orbit.
+Sentiment: NEGATIVE
+Comments: 20
+---
+```
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
 
@@ -146,6 +188,9 @@ The three formatter functions return the following:
 
 **format_to_dict()** returns dict with following format:
 
+<details>
+<summary><strong>format_to_dict output example</strong></summary>
+
 ```json
 {
     "online_group_name": "r/antiwork",
@@ -195,6 +240,7 @@ The three formatter functions return the following:
     ]
 } 
 ```
+</details>
 
 **format_by_cluster()** returns pandas DataFrame with columns:
 
