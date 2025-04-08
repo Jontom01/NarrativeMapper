@@ -35,6 +35,7 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 
 <details>
 <summary><strong>Click to view installation process</strong></summary>
+
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
 ```bash
