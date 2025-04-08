@@ -47,6 +47,7 @@ pip install NarrativeMapper
 
 <details>
 <summary><strong>Click to view setup process</strong></summary>
+
 1. Create a .env file in your root directory (same folder where your script runs).
 
 2. Inside the .env file, add your OpenAI API key like this:
