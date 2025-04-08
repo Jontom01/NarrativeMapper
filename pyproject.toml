@@ -18,7 +18,8 @@ dependencies = [
     "scikit-learn",
     "python-dotenv",
     "transformers",
-    "tiktoken"
+    "tiktoken",
+    "rich"
 ]
 
 [tool.setuptools.packages.find]

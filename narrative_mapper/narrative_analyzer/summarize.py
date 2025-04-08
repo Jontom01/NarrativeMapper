@@ -1,6 +1,7 @@
 from transformers import pipeline
 from openai import OpenAI
 from .openai_utils import get_openai_key
+from rich.progress import Progress
 import pandas as pd
 
 client = OpenAI(api_key=get_openai_key())
@@ -33,7 +34,7 @@ def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
         overall = "NEUTRAL"
     return overall, sentiments
 
-def extract_keywords_for_cluster(texts) -> str:
+def extract_summary_for_cluster(texts) -> str:
     """
     Uses OpenAI Chat Completions to summarize the main theme of a cluster of texts.
     Returns a concise 1-sentence summary string.
@@ -90,18 +91,27 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFra
     
     #use OpenAI Chat Completions to extract a concise summary (cluster label) for each cluster
     cluster_summary = []
-    for texts in grouped_df['text']:
-        summary = extract_keywords_for_cluster(texts)
-        cluster_summary.append(summary)
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Extracting summaries...", total=len(grouped_df))
+        for texts in grouped_df['text']:
+            summary = extract_summary_for_cluster(texts)
+            cluster_summary.append(summary)
+
+            progress.update(task, advance=len(grouped_df['text']))
+
     grouped_df['cluster_summary'] = cluster_summary
     
     #analyze sentiments for each cluster
     aggregated_sentiments = []
     all_sentiments = []
-    for texts in grouped_df['text']:
-        overall, sentiments = analyze_sentiments_for_texts(texts)
-        aggregated_sentiments.append(overall)
-        all_sentiments.append(sentiments)
+    with Progress() as progress:
+        task = progress.add_task("[cyan]Extracting sentiments...", total=len(grouped_df))
+        for texts in grouped_df['text']:
+            overall, sentiments = analyze_sentiments_for_texts(texts)
+            aggregated_sentiments.append(overall)
+            all_sentiments.append(sentiments)
+
+            progress.update(task, advance=len(grouped_df['text']))
     
     grouped_df['aggregated_sentiment'] = aggregated_sentiments
     grouped_df['all_sentiments'] = all_sentiments

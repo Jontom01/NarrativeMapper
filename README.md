@@ -119,44 +119,44 @@ The three formatter functions return the following:
         {
             "cluster": 0,
             "cluster_summary": "The core theme of this cluster revolves around the frustrations and challenges of the modern job application and interview process, highlighting issues such as discrimination, exploitative practices, and the disconnect between employers and candidates.",
-            "tone": "NEGATIVE",
-            "comment_count": 76
+            "sentiment": "NEGATIVE",
+            "text_count": 76
         },
         {
             "cluster": 1,
             "cluster_summary": "The core theme of this cluster revolves around the debate over low wages in the fast food industry, the impact of wage increases on business practices and pricing, and the broader implications for workers' livelihoods and economic conditions.",
-            "tone": "NEGATIVE",
-            "comment_count": 100
+            "sentiment": "NEGATIVE",
+            "text_count": 100
         },
         {
             "cluster": 2,
             "cluster_summary": "The cluster reflects widespread frustration and despair among younger generations regarding economic instability, unaffordable living costs, inadequate healthcare, and the perceived indifference of older generations towards their struggles.",
-            "tone": "NEGATIVE",
-            "comment_count": 112
+            "sentiment": "NEGATIVE",
+            "text_count": 112
         },
         {
             "cluster": 3,
             "cluster_summary": "The core theme of this cluster revolves around employee dissatisfaction with management practices, workplace exploitation, and the importance of asserting one's rights and boundaries in a toxic work environment.",
-            "tone": "NEGATIVE",
-            "comment_count": 464
+            "sentiment": "NEGATIVE",
+            "text_count": 464
         },
         {
             "cluster": 4,
             "cluster_summary": "The core theme of this cluster revolves around dissatisfaction with traditional work structures, advocating for reduced work hours, better work-life balance, and criticism of corporate exploitation and the lack of employee rights.",
-            "tone": "NEGATIVE",
-            "comment_count": 95
+            "sentiment": "NEGATIVE",
+            "text_count": 95
         },
         {
             "cluster": 5,
             "cluster_summary": "The core theme of this cluster revolves around wealth inequality, criticizing the hoarding of wealth by billionaires and the systemic issues that perpetuate economic disparity and exploitation of the working class.",
-            "tone": "NEGATIVE",
-            "comment_count": 95
+            "sentiment": "NEGATIVE",
+            "text_count": 95
         },
         {
             "cluster": 6,
             "cluster_summary": "The comments express strong criticism of capitalism, highlighting themes of exploitation, corporate greed, and the detrimental impact of billionaires and CEOs on workers and society.",
-            "tone": "NEGATIVE",
-            "comment_count": 89
+            "sentiment": "NEGATIVE",
+            "text_count": 89
         }
     ]
 } 
@@ -173,7 +173,7 @@ The three formatter functions return the following:
 
 - **cluster_summary:** summary of the cluster
 
-- **comment_count:** sampled textual messages per cluster
+- **text_count:** sampled textual messages per cluster
 
 - **aggregated_sentiment:** net sentiment, of form 'NEGATIVE', 'POSITIVE', 'NEUTRAL'
 

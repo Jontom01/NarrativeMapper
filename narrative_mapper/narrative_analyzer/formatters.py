@@ -14,12 +14,12 @@ def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
         pd.DataFrame: Cluster-level summary with one row per cluster.
     """
     df = df.copy()
-    comment_count = []
+    text_count = []
     for _, row in df.iterrows():
-        comment_count.append(len(row['text']))
-    df['comment_count'] = comment_count   
+        text_count.append(len(row['text']))
+    df['text_count'] = text_count   
     df['online_group_name'] = online_group_name
-    df = df[['online_group_name', 'cluster', 'cluster_summary', 'comment_count', 'aggregated_sentiment', 'text', 'all_sentiments']]
+    df = df[['online_group_name', 'cluster', 'cluster_summary', 'text_count', 'aggregated_sentiment', 'text', 'all_sentiments']]
     
     return df
 
@@ -70,7 +70,7 @@ def format_to_dict(df, online_group_name="") -> dict:
     """
     Converts the summarized cluster output into a dictionary format useful for JSON export.
 
-    Each cluster includes its label, sentiment tone, and comment count.
+    Each cluster includes its label, sentiment, and comment count.
 
     Parameters:
         df (pd.DataFrame): Output from summarize_clusters().
@@ -84,9 +84,9 @@ def format_to_dict(df, online_group_name="") -> dict:
 
     for _, row in df.iterrows():
         cluster_summary = row["cluster_summary"]
-        tone = row["aggregated_sentiment"]
-        comment_count = len(row['text'])
+        sentiment = row["aggregated_sentiment"]
+        text_count = len(row['text'])
         cluster = row["cluster"]
-        final["clusters"].append({"cluster": cluster, "cluster_summary": cluster_summary, "tone": tone, "comment_count": comment_count})
+        final["clusters"].append({"cluster": cluster, "cluster_summary": cluster_summary, "sentiment": sentiment, "text_count": text_count})
 
     return final
