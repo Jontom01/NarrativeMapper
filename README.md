@@ -73,7 +73,7 @@ from narrative_mapper import *
 Run NarrativeMapper directly from the terminal:
 
 ```bash
-narrativemapper path/to/your.csv
+narrativemapper path/to/your.csv online_group_name
 ```
 This will:
 
