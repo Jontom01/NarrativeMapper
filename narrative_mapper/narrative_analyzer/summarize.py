@@ -5,9 +5,6 @@ from rich.progress import Progress
 import pandas as pd
 import torch
 
-client = OpenAI(api_key=get_openai_key())
-
-
 device= 0 if torch.cuda.is_available() else -1
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
 
@@ -42,7 +39,7 @@ def extract_summary_for_cluster(texts) -> str:
     Uses OpenAI Chat Completions to summarize the main theme of a cluster of texts.
     Returns a concise 1-sentence summary string.
     """
-
+    client = OpenAI(api_key=get_openai_key())
     prompt = f"""
         Here are comments/messages from the same topic cluster (after using embeddings to vectorize the text-semantics and then a clustering algorithm to group them):
         ---

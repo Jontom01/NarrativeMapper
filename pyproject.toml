@@ -25,3 +25,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["narrative_mapper*"]
+
+[project.scripts]
+narrativemapper = "narrative_mapper.narrative_mapper_cli.cli:main"

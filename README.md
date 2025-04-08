@@ -3,16 +3,31 @@
 
 ## Overview
 
-NarrativeMapper is a discourse analysis tool that extracts dominant narratives and emotional tone from online communities using:
+Whether you're coding in Python or simply running a single command in your terminal, NarrativeMapper gives you instant insight into the dominant stories behind the noise.
 
-- OpenAI Embeddings ([OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings))
+Ever wonder what stories are dominating Reddit, Twitter, or any corner of the internet? NarrativeMapper clusters similar online discussions and uses OpenAI’s GPT to summarize the dominant narratives, tone, and sentiment. Built for researchers, journalists, analysts, and anyone trying to make sense of the chaos.
+
+- Extracts dominant narratives from messy text data
+
+- Clusters similar posts using embeddings + UMAP + HDBSCAN
+
+- Summarizes each cluster with GPT
+
+- Analyzes sentiment per narrative
+
+- Plug-and-play pipeline: **CLI**, class-based, or functional
+
+<details>
+<summary><strong>Click to view actual models being used</strong></summary>
+
+- Uses OpenAI Embeddings ([OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings))
 
 - Dimensionality reduction ([UMAP](https://umap-learn.readthedocs.io/en/latest/))
 
 - Density-based clustering ([HDBSCAN](https://hdbscan.readthedocs.io/en/latest/))
 
 - Topic summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
-
+</details>
 
 ## Installation and Setup
 
@@ -28,7 +43,7 @@ pip install NarrativeMapper
 
 1. Create a .env file in your root directory (same folder where your script runs).
 
-2. Inside the .env file, add your OpenAPI key like this:
+2. Inside the .env file, add your OpenAI API key like this:
 
 ```dotenv
 OPENAI_API_KEY="your-api-key-here"
@@ -47,6 +62,23 @@ from narrative_mapper import *
 
 
 ## How to Use
+
+**Option 1: CLI (zero code)**
+
+Run NarrativeMapper directly from the terminal:
+
+```bash
+narrativemapper path/to/your.csv
+```
+This will:
+
+- Load the CSV
+
+- Automatically embed, cluster, and summarize the comments
+
+- Output a formatted results file in the current directory (output_summary.txt)
+
+- Print the summarized narratives and sentiment to the terminal
 
 **Option 1: Class-Based Interface**
 
@@ -67,7 +99,7 @@ mapper.load_embeddings(batch_size=100)
 
 #clustering: main UMAP and HDBSCAN variables along with kwargs for more customizability.
 umap_kwargs =  {'min_dist': 0.0}
-mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, umpa_kwargs=umap_kwargs)
+mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, umap_kwargs=umap_kwargs)
 
 #summarize each cluster's topic and sentiment
 mapper.summarize(max_sample_size=500)
@@ -299,7 +331,7 @@ format_to_dict()
 </details>
 
 
-## Open API Pricing
+## Estimated Cost (OpenAI Pricing)
 
 Estimated cost: **$0.13 to $0.28 per 1 million tokens**.
 

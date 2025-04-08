@@ -6,7 +6,7 @@ import pandas as pd
 import tiktoken
 import re
 
-client = OpenAI(api_key=get_openai_key())
+
 
 def batch_list(big_list, batch_size=500):
     return [big_list[i:i + batch_size] for i in range(0, len(big_list), batch_size)]
@@ -33,6 +33,7 @@ def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
     Returns:
         DataFrame: contains origin columns in file_name, but with the added 'embeddings' column
     """
+    client = OpenAI(api_key=get_openai_key())
     df = df.copy()
     #make try catch to see if text exists
     try:
