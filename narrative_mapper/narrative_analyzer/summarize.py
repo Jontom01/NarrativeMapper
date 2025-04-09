@@ -4,6 +4,7 @@ from .openai_utils import get_openai_key
 from rich.progress import Progress
 import pandas as pd
 import torch
+import random
 
 device= 0 if torch.cuda.is_available() else -1
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
@@ -40,13 +41,19 @@ def extract_summary_for_cluster(texts) -> str:
     Returns a concise 1-sentence summary string.
     """
     client = OpenAI(api_key=get_openai_key())
+    random.shuffle(texts)
     prompt = f"""
-        Here are comments/messages from the same topic cluster (after using embeddings to vectorize the text-semantics and then a clustering algorithm to group them):
+        You are an expert in discourse analysis and topic summarization.
+        
+        Your task is to analyze the following user-generated messages, which were grouped together by semantic similarity using embeddings and clustering.
+        
+        Summarize the central topic(s) discussed across this cluster in one short sentence.
+        Avoid filler words, avoid generic summaries, and use specific nouns when possible.
+        If multiple distinct themes appear, combine them concisely.
         ---
         {texts}
         ---
-        Please summarize the core topic or themes of this cluster in 1 sentence (brief, no filler words).
-        """
+        """   
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[

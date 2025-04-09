@@ -49,12 +49,12 @@ def get_cluster_params(df):
     total_tokens = token_stats['total_tokens']
     avg_tokens = token_stats['average_tokens']
 
-    base = {'n_components': 10, 'n_neighbors': 20, 'min_cluster_size': 20, 'min_samples': 10}
-    if total_tokens < 50000:
+    base = {'n_components': 10, 'n_neighbors': 20, 'min_cluster_size': 50, 'min_samples': 10}
+    if total_tokens < 25000: #~65000 for 1000 reddit comments
         return base
     else:
         #scale n_neighbors and min_cluster_size up with total tokens
-        scale_factor_1 = max(1, (total_tokens / 50000) * 0.75)
+        scale_factor_1 = max(1, (total_tokens / 25000) * 0.75)
         #scale down min_cluster_size slightly with avg_tokens
         scale_factor_2 = max(0.6, min(1.0, 40 / avg_tokens))  # Cap at 0.6 to 1.0
 
@@ -66,8 +66,6 @@ def get_cluster_params(df):
         }
 
 def main():
-    
-
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
     parser.add_argument("file_name", type=str, help="file path")
     parser.add_argument("online_group_name", type=str, help="online group name")
@@ -86,7 +84,9 @@ def main():
         min_samples=cluster_params['min_samples'], 
         umap_kwargs=umap_kwargs
         )
-    output = mapper.summarize().format_to_dict()["clusters"]
+    mapper.summarize(max_sample_size=500)
+    output = mapper.format_to_dict()["clusters"]
+    mapper.format_by_cluster().to_csv("testing.csv", index=False)
 
     with open(f"{args.online_group_name}_NarrativeMapper.txt", "w", encoding="utf-8") as f:
         f.write(f"Run Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")

@@ -87,40 +87,30 @@ This will:
 
 - Print the summarized narratives and sentiment to the terminal
 
-File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/comment_data/comment_data_space.csv):
+File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/comment_data/comment_data_politics_1200.csv):
 
 ```txt
-Run Timestamp: 2025-04-08 19:12:45
-Online Group Name: reddit_space_subreddit
+Run Timestamp: 2025-04-09 01:46:44
+Online Group Name: reddit_politics_subreddit
 
-Summary: The core themes of this cluster revolve around the awe and nostalgia associated with the Voyager missions, the challenges of long-term space exploration, and imaginative reflections on extraterrestrial life and science fiction.
-Sentiment: NEUTRAL
-Comments: 25
----
-
-Summary: The core theme of this cluster revolves around discussions of space, galaxies, the universe's vastness, and the implications of astronomical phenomena on our understanding of life and existence.
+Summary: The cluster discusses the perceived corruption and overreach of the Supreme Court, the implications of political power dynamics under the Biden administration, and the urgent need for reforms in housing and justice systems, particularly in relation to Trump and the Republican Party's actions.
 Sentiment: NEGATIVE
-Comments: 95
+Comments: 200
 ---
 
-Summary: The cluster revolves around personal experiences and emotions related to witnessing solar eclipses and auroras, highlighting the awe, excitement, and challenges of viewing these celestial events.
-Sentiment: NEUTRAL
-Comments: 63
----
-
-Summary: The core theme of this cluster revolves around admiration and appreciation for a stunning astronomical photograph, with many comments expressing curiosity about the techniques used to capture it and requests for high-resolution versions for personal use.
-Sentiment: POSITIVE
-Comments: 48
----
-
-Summary: The cluster primarily discusses concerns and criticisms regarding Boeing's safety record, management practices, and the implications for NASA's reliance on Boeing for crewed space missions, juxtaposed with support for SpaceX's advancements in space travel.
+Summary: The cluster discusses the political landscape surrounding the 2024 presidential election, focusing on Kamala Harris's campaign against Donald Trump, their contrasting public personas, and the implications of age and mental acuity on their candidacies, while also highlighting voter registration trends and the need for Democratic mobilization.
 Sentiment: NEGATIVE
-Comments: 53
+Comments: 482
 ---
 
-Summary: The cluster discusses concerns about space debris, the irresponsibility of space agencies, particularly China, and the need for international cooperation and regulation to address the growing problem of litter in Earth's orbit.
+Summary: The cluster discusses Donald Trump's legal troubles, including his felony convictions and accusations of serious crimes, alongside criticism of his behavior and the implications for his political future.
 Sentiment: NEGATIVE
-Comments: 20
+Comments: 92
+---
+
+Summary: The cluster discusses the normalization of political violence among conservatives, the inadequacy of "thoughts and prayers" in addressing gun violence, and the hypocrisy of right-wing responses to mass shootings, particularly in relation to an assassination attempt on Donald Trump.
+Sentiment: NEGATIVE
+Comments: 86
 ---
 ```
 
