@@ -11,6 +11,7 @@ if not openai_key:
     raise RuntimeError("OPENAI_API_KEY not set. Please provide it in a .env file.")
 
 from narrative_mapper.narrative_analyzer.narrative_mapper import NarrativeMapper
+from .cluster_config import BASELINE_MODES
 from rich.logging import RichHandler
 from datetime import datetime
 import logging
@@ -40,54 +41,62 @@ def calculate_token_stats(text_list, model="text-embedding-3-large"):
 
     return {
         "average_tokens": round(average_tokens, 2),
-        "total_tokens": total_tokens
+        "total_tokens": total_tokens,
+        "num_texts": len(text_list)
     }
 
-def get_cluster_params(df, verbose=False):
+def get_cluster_params(df, mode, verbose):
     text_list = df['text'].tolist()
-
+    num_texts = len(text_list)
     token_stats = calculate_token_stats(text_list)
+
     total_tokens = token_stats['total_tokens']
     avg_tokens = token_stats['average_tokens']
 
-    base = {
-        'n_components': 10, 
-        'n_neighbors': 20, 
-        'min_cluster_size': 50, 
-        'min_samples': 10
-        }
+    baseline = BASELINE_MODES.get(mode, BASELINE_MODES["standard"])
 
-    if total_tokens < 25000: #~65000 for 1000 reddit comments
-        return base
-    
-    size_scale = max(1, (total_tokens / 25000) * 0.75)
-    length_inverse_scale = max(0.6, min(1.0, 40 / avg_tokens))
-
-    params = {
-        "n_neighbors": int(base["n_neighbors"] * size_scale),
-        "n_components": base["n_components"],
-        "min_cluster_size": int(base["min_cluster_size"] * size_scale * length_inverse_scale),
-        "min_samples": int(base["min_samples"] * length_inverse_scale),
-    }
-
-    if verbose:
-        print(f"[Param Scaling]")
-        print(f"Total tokens: {total_tokens}")
-        print(f"Avg tokens/text: {avg_tokens:.2f}")
-        print(f"n_neighbors: {params['n_neighbors']}")
-        print(f"min_cluster_size: {params['min_cluster_size']}")
-        print(f"min_samples: {params['min_samples']}")
-
-    return params
+    return baseline.scale_params(
+        total_tokens=total_tokens,
+        avg_tokens=avg_tokens,
+        num_texts=num_texts,
+        verbose=verbose
+    )
 
 def main():
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
     parser.add_argument("file_name", type=str, help="file path")
     parser.add_argument("online_group_name", type=str, help="online group name")
+
+    #FLAGS
+    parser.add_argument(
+        "--cluster-mode",
+        type=str,
+        choices=["standard", "long_form", "short_form"],
+        default="standard",
+        help="Choose a clustering mode (default: standard)"
+    )
+
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print detailed parameter scaling info"
+    )
+    '''
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview scaled parameters without running clustering"
+    )
+    '''
     args = parser.parse_args()
 
     df = pd.read_csv(args.file_name)
-    cluster_params = get_cluster_params(df, verbose=True)
+
+    mode = args.cluster_mode or "standard"
+    verbose = args.verbose or False
+
+    cluster_params = get_cluster_params(df, mode, verbose)
+
     mapper = NarrativeMapper(df, args.online_group_name)
     mapper.load_embeddings()
     umap_kwargs =  {'min_dist': 0.0}
