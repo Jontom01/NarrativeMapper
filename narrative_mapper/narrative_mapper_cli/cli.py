@@ -18,6 +18,7 @@ import argparse
 import tiktoken
 import csv
 import pandas as pd
+import math
 
 #better cluster param calculations, flag options (sample size limiter, batch_size, output file directory)
 def calculate_token_stats(text_list, model="text-embedding-3-large"):
@@ -42,28 +43,42 @@ def calculate_token_stats(text_list, model="text-embedding-3-large"):
         "total_tokens": total_tokens
     }
 
-def get_cluster_params(df):
+def get_cluster_params(df, verbose=False):
     text_list = df['text'].tolist()
 
     token_stats = calculate_token_stats(text_list)
     total_tokens = token_stats['total_tokens']
     avg_tokens = token_stats['average_tokens']
 
-    base = {'n_components': 10, 'n_neighbors': 20, 'min_cluster_size': 50, 'min_samples': 10}
+    base = {
+        'n_components': 10, 
+        'n_neighbors': 20, 
+        'min_cluster_size': 50, 
+        'min_samples': 10
+        }
+
     if total_tokens < 25000: #~65000 for 1000 reddit comments
         return base
-    else:
-        #scale n_neighbors and min_cluster_size up with total tokens
-        scale_factor_1 = max(1, (total_tokens / 25000) * 0.75)
-        #scale down min_cluster_size slightly with avg_tokens
-        scale_factor_2 = max(0.6, min(1.0, 40 / avg_tokens))  # Cap at 0.6 to 1.0
+    
+    size_scale = max(1, (total_tokens / 25000) * 0.75)
+    length_inverse_scale = max(0.6, min(1.0, 40 / avg_tokens))
 
-        return {
-            "n_neighbors": int(base["n_neighbors"] * scale_factor_1),
-            "n_components": base["n_components"],
-            "min_cluster_size": int(base["min_cluster_size"] * scale_factor_1 * scale_factor_2),
-            "min_samples": int(base["min_samples"] * scale_factor_2),
-        }
+    params = {
+        "n_neighbors": int(base["n_neighbors"] * size_scale),
+        "n_components": base["n_components"],
+        "min_cluster_size": int(base["min_cluster_size"] * size_scale * length_inverse_scale),
+        "min_samples": int(base["min_samples"] * length_inverse_scale),
+    }
+
+    if verbose:
+        print(f"[Param Scaling]")
+        print(f"Total tokens: {total_tokens}")
+        print(f"Avg tokens/text: {avg_tokens:.2f}")
+        print(f"n_neighbors: {params['n_neighbors']}")
+        print(f"min_cluster_size: {params['min_cluster_size']}")
+        print(f"min_samples: {params['min_samples']}")
+
+    return params
 
 def main():
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
@@ -72,8 +87,7 @@ def main():
     args = parser.parse_args()
 
     df = pd.read_csv(args.file_name)
-    cluster_params = get_cluster_params(df)
-    #print(cluster_params)
+    cluster_params = get_cluster_params(df, verbose=True)
     mapper = NarrativeMapper(df, args.online_group_name)
     mapper.load_embeddings()
     umap_kwargs =  {'min_dist': 0.0}
