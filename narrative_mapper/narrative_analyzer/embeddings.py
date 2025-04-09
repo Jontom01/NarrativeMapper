@@ -1,15 +1,9 @@
 from openai import OpenAI
 from sklearn.preprocessing import normalize
-from .openai_utils import get_openai_key
+from .utils import get_openai_key, batch_list
 from rich.progress import Progress
 import pandas as pd
-import tiktoken
 import re
-
-
-
-def batch_list(big_list, batch_size=500):
-    return [big_list[i:i + batch_size] for i in range(0, len(big_list), batch_size)]
 
 def clean_texts(text_list: list[str]):
     for text in text_list:
@@ -19,7 +13,7 @@ def clean_texts(text_list: list[str]):
         text = re.sub(r'<.*?>', '', text)
     return text_list
 
-def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
+def get_embeddings(df) -> pd.DataFrame:
     """
     Generates OpenAI text embeddings.
 
@@ -43,17 +37,11 @@ def get_embeddings(df, batch_size: int=50) -> pd.DataFrame:
         raise e
 
     embeddings_list = []
-    batches = batch_list(text_list, batch_size) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
-    encoding = tiktoken.encoding_for_model("text-embedding-3-large")
+    batches = batch_list(text_list, model="text-embedding-3-large", max_tokens=8000) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
     with Progress() as progress:
         task = progress.add_task("[cyan]Embedding texts...", total=len(text_list))
         for batch in batches:
             batch = clean_texts(batch) #clean text input
-            total_tokens = sum(len(encoding.encode(message)) for message in batch)
-
-            if total_tokens > 8191:
-                print("A batch exceeded token limit. Decrease batch_size parameter value.")
-
             response = client.embeddings.create(
                 input=batch,
                 model="text-embedding-3-large"

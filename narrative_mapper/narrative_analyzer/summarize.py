@@ -1,13 +1,13 @@
 from transformers import pipeline
 from openai import OpenAI
-from .openai_utils import get_openai_key
+from .utils import get_openai_key, batch_list
 from rich.progress import Progress
 import pandas as pd
 import torch
-import random
 
 device= 0 if torch.cuda.is_available() else -1
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
+
 
 def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
     """
@@ -35,33 +35,62 @@ def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
         overall = "NEUTRAL"
     return overall, sentiments
 
-def extract_summary_for_cluster(texts) -> str:
+def extract_summary_for_cluster(texts: list[str]) -> str:
     """
-    Uses OpenAI Chat Completions to summarize the main theme of a cluster of texts.
-    Returns a concise 1-sentence summary string.
+    Summarizes a cluster of semantically similar texts into one precise sentence.
+    Uses a two-stage summarization strategy to handle token limits and improve accuracy.
     """
     client = OpenAI(api_key=get_openai_key())
-    random.shuffle(texts)
-    prompt = f"""
+    
+    summary_batches = []
+    batches = batch_list(texts, model="gpt-4o-mini", max_tokens=7000)
+    
+    for batch in batches:
+        joined_batch = "\n".join(batch)
+
+        prompt = f"""
         You are an expert in discourse analysis and topic summarization.
-        
+
         Your task is to analyze the following user-generated messages, which were grouped together by semantic similarity using embeddings and clustering.
-        
-        Summarize the central topic(s) discussed across this cluster in one short sentence.
-        Avoid filler words, avoid generic summaries, and use specific nouns when possible.
-        If multiple distinct themes appear, combine them concisely.
+
+        Summarize the *recurring themes or central topic(s)* discussed in this cluster using **one short sentence**.
+
+        Be specific. Avoid vague or generic summaries. Use concrete nouns. If multiple recurring themes are present, combine them concisely. Avoid filler words.
+
         ---
-        {texts}
+        {joined_batch}
         ---
-        """   
-    response = client.chat.completions.create(
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+        summary = response.choices[0].message.content.strip()
+        summary_batches.append(summary)
+
+    combined_summaries = "\n".join(summary_batches)
+
+    final_prompt = f"""
+    You are an expert in summarization.
+
+    Here are partial summaries of different batches from a single conversation cluster:
+    ---
+    {combined_summaries}
+    ---
+    Synthesize them into **one precise sentence** summarizing the main topic(s).
+    Avoid redundancy and avoid vague language. Be specific.
+    """
+
+    final_response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.5
+        messages=[{"role": "user", "content": final_prompt}],
+        temperature=0.2
     )
-    return str(response.choices[0].message.content)
+
+    return final_response.choices[0].message.content.strip()
+
 
 def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFrame:
     """

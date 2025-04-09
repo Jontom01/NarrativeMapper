@@ -131,7 +131,7 @@ file_df = pd.read_csv("file-path")
 mapper = NarrativeMapper(file_df, "r/antiwork")
 
 #embeds semantic vectors
-mapper.load_embeddings(batch_size=100)
+mapper.load_embeddings()
 
 #clustering: main UMAP and HDBSCAN variables along with kwargs for more customizability.
 umap_kwargs =  {'min_dist': 0.0}
@@ -162,7 +162,7 @@ import pandas as pd
 df = pd.read_csv("file-path")
 
 #manual control over each step:
-embeddings = get_embeddings(file_df, batch_size=100)
+embeddings = get_embeddings(file_df)
 cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
 summary_df = summarize_clusters(cluster_df, max_sample_size=500)
 
@@ -289,7 +289,7 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```python
 
 #Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
-get_embeddings(file_df, batch_size=...)
+get_embeddings(file_df)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 cluster_embeddings(
@@ -332,7 +332,7 @@ class NarrativeMapper:
 
 **Methods:**
 ```python
-load_embeddings(batch_size=...)
+load_embeddings()
 cluster(
     n_components=..., 
     n_neighbors=..., 
@@ -363,8 +363,6 @@ format_to_dict()
 - **umap_kwargs:** Allows for input of other UMAP parameters.
 
 - **hdbscan_kwags:** Allows for input of other HDBSCAN parameters.
-
-- **batch_size:** Number of messages processed per API request to avoid token limits. Choose smaller values the larger your textual messages are.
 
 - **max_sample_size:** Maximum number of comments sampled per cluster for summarization.
 

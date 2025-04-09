@@ -75,7 +75,7 @@ def main():
     cluster_params = get_cluster_params(df)
     #print(cluster_params)
     mapper = NarrativeMapper(df, args.online_group_name)
-    mapper.load_embeddings(batch_size=100)
+    mapper.load_embeddings()
     umap_kwargs =  {'min_dist': 0.0}
     mapper.cluster(
         n_components=cluster_params['n_components'], 
