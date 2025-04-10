@@ -1,7 +1,8 @@
 from transformers import pipeline
 from openai import OpenAI
 from .utils import get_openai_key, batch_list
-from rich.progress import Progress
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
+from contextlib import nullcontext
 import pandas as pd
 import torch
 
@@ -92,7 +93,7 @@ def extract_summary_for_cluster(texts: list[str]) -> str:
     return final_response.choices[0].message.content.strip()
 
 
-def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFrame:
+def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False) -> pd.DataFrame:
     """
     Summarizes each text cluster by extracting the narrative and sentiment analysis of each cluster.
 
@@ -127,27 +128,50 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500) -> pd.DataFra
     
     #use OpenAI Chat Completions to extract a concise summary (cluster label) for each cluster
     cluster_summary = []
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Extracting summaries...", total=len(grouped_df))
+    
+    progress_context_summary = (
+    Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn()
+        ) if verbose else nullcontext()
+    )
+    with progress_context_summary as progress:
+        if verbose:
+            task = progress.add_task("[cyan]Extracting summaries...", total=len(grouped_df['text']))
+            
         for texts in grouped_df['text']:
             summary = extract_summary_for_cluster(texts)
             cluster_summary.append(summary)
-
-            progress.update(task, advance=len(grouped_df['text']))
+            if verbose:
+                progress.update(task, advance=1)
 
     grouped_df['cluster_summary'] = cluster_summary
     
     #analyze sentiments for each cluster
     aggregated_sentiments = []
     all_sentiments = []
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Extracting sentiments...", total=len(grouped_df))
+
+    progress_context_sentiment = (
+    Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn()
+        ) if verbose else nullcontext()
+    )
+    with progress_context_sentiment as progress:
+        if verbose:
+            task = progress.add_task("[cyan]Extracting sentiments...", total=len(grouped_df['text']))
+
         for texts in grouped_df['text']:
             overall, sentiments = analyze_sentiments_for_texts(texts)
             aggregated_sentiments.append(overall)
             all_sentiments.append(sentiments)
 
-            progress.update(task, advance=len(grouped_df['text']))
+            if verbose:
+                progress.update(task, advance=1)
     
     grouped_df['aggregated_sentiment'] = aggregated_sentiments
     grouped_df['all_sentiments'] = all_sentiments

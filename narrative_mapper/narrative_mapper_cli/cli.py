@@ -11,56 +11,49 @@ if not openai_key:
     raise RuntimeError("OPENAI_API_KEY not set. Please provide it in a .env file.")
 
 from narrative_mapper.narrative_analyzer.narrative_mapper import NarrativeMapper
-from .cluster_config import BASELINE_MODES
 from rich.logging import RichHandler
 from datetime import datetime
+from math import sqrt, log2
 import logging
 import argparse
-import tiktoken
 import csv
 import pandas as pd
-import math
 
 #better cluster param calculations, flag options (sample size limiter, batch_size, output file directory)
-def calculate_token_stats(text_list, model="text-embedding-3-large"):
-    """
-    Calculates average and total tokens for a list of messages.
-
-    Args:
-        text_list (List[str]): List of textual messages.
-        model (str): Model name to load correct tokenizer.
-
-    Returns:
-        dict: {'average_tokens': float, 'total_tokens': int}
-    """
-    encoding = tiktoken.encoding_for_model(model)
-
-    token_counts = [len(encoding.encode(text)) for text in text_list]
-    total_tokens = sum(token_counts)
-    average_tokens = total_tokens / len(text_list) if text_list else 0
-
-    return {
-        "average_tokens": round(average_tokens, 2),
-        "total_tokens": total_tokens,
-        "num_texts": len(text_list)
-    }
-
-def get_cluster_params(df, mode, verbose):
+def get_cluster_params(df, verbose=False):
     text_list = df['text'].tolist()
     num_texts = len(text_list)
-    token_stats = calculate_token_stats(text_list)
+    base_num_texts = 500
+    N = max(1, num_texts / base_num_texts)
 
-    total_tokens = token_stats['total_tokens']
-    avg_tokens = token_stats['average_tokens']
+    #n_components ~ constant to N. 
+    n_components = 10
 
-    baseline = BASELINE_MODES.get(mode, BASELINE_MODES["standard"])
+    #n_neighbors ~ sqrt(N). range [10, 60]
+    n_neighbors = int(min(60, max(10, 10*sqrt(N))))
 
-    return baseline.scale_params(
-        total_tokens=total_tokens,
-        avg_tokens=avg_tokens,
-        num_texts=num_texts,
-        verbose=verbose
-    )
+    #min_cluster_size ~ sqrt(N). range [15, 200]
+    min_cluster_size = int(min(200, max(15, 15*sqrt(N))))
+
+    #min_samples ~ log2(N). range [5, 20]
+    min_samples = int(min(20, max(5, 5*log2(N))))
+
+    params = {
+        "n_neighbors": n_neighbors,
+        "n_components": n_components,
+        "min_cluster_size": min_cluster_size,
+        "min_samples": min_samples,
+    }
+
+    if verbose:
+        print(f"[PARAM SCALING]")
+        print(f"Text count: {num_texts}")
+        print(f"n_components: {params['n_components']}")
+        print(f"n_neighbors: {params['n_neighbors']}")
+        print(f"min_cluster_size: {params['min_cluster_size']}")
+        print(f"min_samples: {params['min_samples']}")
+
+    return params
 
 def main():
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
@@ -68,14 +61,7 @@ def main():
     parser.add_argument("online_group_name", type=str, help="online group name")
 
     #FLAGS
-    parser.add_argument(
-        "--cluster-mode",
-        type=str,
-        choices=["standard", "long_form", "short_form"],
-        default="standard",
-        help="Choose a clustering mode (default: standard)"
-    )
-
+    # gotta add one for file or no file
     parser.add_argument(
         "--verbose",
         action="store_true",
@@ -89,17 +75,14 @@ def main():
     )
     '''
     args = parser.parse_args()
-
     df = pd.read_csv(args.file_name)
-
-    mode = args.cluster_mode or "standard"
     verbose = args.verbose or False
 
-    cluster_params = get_cluster_params(df, mode, verbose)
+    cluster_params = get_cluster_params(df, verbose)
 
-    mapper = NarrativeMapper(df, args.online_group_name)
+    mapper = NarrativeMapper(df, args.online_group_name, verbose)
     mapper.load_embeddings()
-    umap_kwargs =  {'min_dist': 0.0}
+    umap_kwargs =  {'min_dist': 0.0, 'low_memory': True}
     mapper.cluster(
         n_components=cluster_params['n_components'], 
         n_neighbors=cluster_params['n_neighbors'], 
@@ -109,7 +92,7 @@ def main():
         )
     mapper.summarize(max_sample_size=500)
     output = mapper.format_to_dict()["clusters"]
-    mapper.format_by_cluster().to_csv("testing.csv", index=False)
+   # mapper.format_by_cluster().to_csv("testing.csv", index=False)
 
     with open(f"{args.online_group_name}_NarrativeMapper.txt", "w", encoding="utf-8") as f:
         f.write(f"Run Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
@@ -117,7 +100,7 @@ def main():
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(message)s",  # You can add timestamps with "%(asctime)s - %(message)s"
+        format="%(message)s",
         handlers=[
             logging.FileHandler(f"{args.online_group_name}_NarrativeMapper.txt", mode='a', encoding='utf-8'),
             logging.StreamHandler()

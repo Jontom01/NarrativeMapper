@@ -1,4 +1,7 @@
 from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.decomposition import PCA
+from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+from contextlib import nullcontext
 import umap.umap_ as umap
 import hdbscan
 import pandas as pd
@@ -9,6 +12,7 @@ def cluster_embeddings(
     n_neighbors=20, 
     min_cluster_size=40, 
     min_samples=15,
+    verbose=False,
     umap_kwargs=None,
     hdbscan_kwargs=None
     ) -> pd.DataFrame:
@@ -33,32 +37,65 @@ def cluster_embeddings(
     """
     embeddings = df['embeddings'].tolist()
     
-    #UMAP dimensionality:
-    if umap_kwargs == None:
-        umap_kwargs = {}
+    #PCA so UMAP doesn't assassinate my memory
+    pca = PCA(n_components=100)
+    reduced_embeddings = pca.fit_transform(embeddings)
 
-    umap_reducer = umap.UMAP(
-        n_neighbors=n_neighbors,
-        n_components=n_components,
-        metric='cosine',
-        **umap_kwargs       
+    #UMAP dimensionality:
+    progress_context_umap = (
+    Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        TimeElapsedColumn()
+        ) if verbose else nullcontext()
     )
-    reduced_embeddings = umap_reducer.fit_transform(embeddings)
+    with progress_context_umap as progress:
+        if verbose:
+            task = progress.add_task("[cyan]UMAP reducing dimensions...", total=1)
+
+        if umap_kwargs == None:
+            umap_kwargs = {}
+
+        umap_reducer = umap.UMAP(
+            n_neighbors=n_neighbors,
+            n_components=n_components,
+            metric='cosine',
+            **umap_kwargs       
+        )
+        reduced_embeddings = umap_reducer.fit_transform(reduced_embeddings)
+
+        if verbose:
+            progress.update(task, advance=1)
+    
 
     distance_matrix = pairwise_distances(reduced_embeddings, metric='cosine')
     distance_matrix = distance_matrix.astype('float64')
 
     #HDBSCAN clustering:
-    if hdbscan_kwargs == None:
-        hdbscan_kwargs = {}
-
-    clusterer = hdbscan.HDBSCAN(
-        min_cluster_size=min_cluster_size,
-        min_samples=min_samples,
-        metric='precomputed',
-        **hdbscan_kwargs
+    progress_context_hdbscan = (
+    Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        TimeElapsedColumn()
+        ) if verbose else nullcontext()
     )
-    cluster_labels = clusterer.fit_predict(distance_matrix)
+    with progress_context_hdbscan as progress:
+        if verbose:
+            task = progress.add_task("[cyan]HDBSCAN clustering...", total=1)
+
+        if hdbscan_kwargs == None:
+            hdbscan_kwargs = {}
+
+        clusterer = hdbscan.HDBSCAN(
+            min_cluster_size=min_cluster_size,
+            min_samples=min_samples,
+            metric='precomputed',
+            **hdbscan_kwargs
+        )
+        cluster_labels = clusterer.fit_predict(distance_matrix)
+
+        if verbose:
+            progress.update(task, advance=1)
 
     df = df.copy()
     df['cluster'] = cluster_labels.tolist()

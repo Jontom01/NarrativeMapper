@@ -1,7 +1,8 @@
 from openai import OpenAI
 from sklearn.preprocessing import normalize
 from .utils import get_openai_key, batch_list
-from rich.progress import Progress
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
+from contextlib import nullcontext
 import pandas as pd
 import re
 
@@ -11,9 +12,10 @@ def clean_texts(text_list: list[str]):
         text = re.sub(r'\s+', ' ', text)
         text = re.sub(r'https?://\S+', '', text)
         text = re.sub(r'<.*?>', '', text)
+        text = re.sub(r'@\w+', '', text)
     return text_list
 
-def get_embeddings(df) -> pd.DataFrame:
+def get_embeddings(df, verbose=False) -> pd.DataFrame:
     """
     Generates OpenAI text embeddings.
 
@@ -38,8 +40,18 @@ def get_embeddings(df) -> pd.DataFrame:
 
     embeddings_list = []
     batches = batch_list(text_list, model="text-embedding-3-large", max_tokens=8000) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Embedding texts...", total=len(text_list))
+    
+    progress_context = (
+    Progress(
+        SpinnerColumn(),
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(),
+        TimeElapsedColumn()
+        ) if verbose else nullcontext()
+    )
+    with progress_context as progress:
+        if verbose:
+            task = progress.add_task("[cyan]Embedding texts...", total=len(text_list))
         for batch in batches:
             batch = clean_texts(batch) #clean text input
             response = client.embeddings.create(
@@ -48,7 +60,8 @@ def get_embeddings(df) -> pd.DataFrame:
             )
             for item in response.data:
                 embeddings_list.append(item.embedding)
-            progress.update(task, advance=len(batch))
+            if verbose:
+                progress.update(task, advance=len(batch))
 
     normalize_embeddings = normalize(embeddings_list, norm='l2') #since both UMAP + HDBSCAN are setup for cosine similarity
     df['embeddings'] = normalize_embeddings.tolist()

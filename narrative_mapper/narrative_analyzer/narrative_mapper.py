@@ -13,7 +13,7 @@ class NarrativeMapper:
     and format the results into various output structures.
     """
     
-    def __init__(self, df, online_group_name: str):
+    def __init__(self, df, online_group_name: str, verbose=False):
         """
         Initializes the NarrativeMapper instance.
         
@@ -23,6 +23,7 @@ class NarrativeMapper:
         """
         self.file_df = df
         self.online_group_name = online_group_name
+        self.verbose = verbose
         self.embeddings_df = None
         self.cluster_df = None
         self.summary_df = None
@@ -37,7 +38,7 @@ class NarrativeMapper:
         Returns:
             NarrativeMapper: Self, with embeddings loaded.
         """
-        self.embeddings_df = get_embeddings(self.file_df)
+        self.embeddings_df = get_embeddings(self.file_df, self.verbose)
         return self
 
     def cluster(
@@ -68,6 +69,7 @@ class NarrativeMapper:
             n_neighbors=n_neighbors,
             min_cluster_size=min_cluster_size,
             min_samples=min_samples,
+            verbose=self.verbose,
             umap_kwargs=umap_kwargs,
             hdbscan_kwargs=hdbscan_kwargs
         )
@@ -83,7 +85,7 @@ class NarrativeMapper:
         Returns:
             NarrativeMapper: Self, with summarized clusters stored.
         """
-        self.summary_df = summarize_clusters(self.cluster_df, max_sample_size)
+        self.summary_df = summarize_clusters(self.cluster_df, max_sample_size, verbose=self.verbose)
         return self
 
     def format_by_text(self) -> pd.DataFrame:
