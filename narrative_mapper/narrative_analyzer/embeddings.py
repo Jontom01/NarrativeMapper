@@ -18,7 +18,7 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
 
     The input DataFrame must contain 'text' column. The function sends
     each 'text' value to the OpenAI embedding API in batches and then adds a new 'embeddings' 
-    column to output DataFrame containing the 3072-dimensional semantic embedding.
+    column to output DataFrame containing the 1536-dimensional semantic embedding.
 
     Parameters:
         DataFrame: Must include 'text' column
@@ -36,7 +36,7 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
         raise e
 
     embeddings_list = []
-    batches = batch_list(text_list, model="text-embedding-3-large", max_tokens=8000) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
+    batches = batch_list(text_list, model="text-embedding-3-small", max_tokens=8000) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.
     
     progress_context = (
     Progress(
@@ -53,7 +53,7 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
             batch = clean_texts(batch) #clean text input
             response = client.embeddings.create(
                 input=batch,
-                model="text-embedding-3-large"
+                model="text-embedding-3-small"
             )
             for item in response.data:
                 embeddings_list.append(item.embedding)

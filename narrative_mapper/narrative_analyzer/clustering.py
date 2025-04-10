@@ -72,10 +72,12 @@ def cluster_embeddings(
     hdbscan_kwargs=None
     ) -> pd.DataFrame:
     """
+    Preprocesses using L2 normalization and PCA to 100 dim.
+
     Reduces dimensionality of embedding vectors using UMAP and clusters them using HDBSCAN.
 
-    Each dictionary must include an 'embedding_vector' key. After clustering, a 'cluster' label is added
-    to each dictionary. The function returns a DataFrame with all original keys (excluding 'embedding_vector') 
+    Each DataFrame must include an 'embedding_vector' col. After clustering, a 'cluster' label is added
+    to each DataFrame. The function returns a DataFrame with all original cols
     and the assigned 'cluster' label, excluding the noise cluster (cluster = -1).
 
     Parameters:
@@ -90,12 +92,12 @@ def cluster_embeddings(
     Returns:
         pd.DataFrame: DataFrame of clustered items with a 'cluster' column.
     """
-    embeddings = df['embeddings'].tolist()
+    embeddings = np.array(df['embeddings'].tolist(), dtype=np.float32) #convert to np.array with float32 vals for less mem usage
     embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
 
     #PCA so UMAP doesn't assassinate my memory
     pca = PCA(n_components=100)
-    reduced_embeddings = pca.fit_transform(embeddings)
+    reduced_embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
 
     #UMAP dimensionality:
     progress_context_umap = (
@@ -123,7 +125,7 @@ def cluster_embeddings(
 
         if verbose:
             progress.update(task, advance=1)
-    
+ 
     #HDBSCAN clustering:
     progress_context_hdbscan = (
     Progress(

@@ -57,7 +57,7 @@ def extract_summary_for_cluster(texts: list[str]) -> str:
 
         Your task is to analyze the following user-generated messages, which were grouped together by semantic similarity using embeddings and clustering.
 
-        Summarize the *recurring themes or central topic(s)* discussed in this cluster using **one short sentence**.
+        Summarize the *LARGEST recurring themes or central topic(s)* discussed in this cluster using **one short sentence**.
 
         Be specific. Avoid vague or generic summaries. Use concrete nouns. If multiple recurring themes are present, combine them concisely. Avoid filler words.
 

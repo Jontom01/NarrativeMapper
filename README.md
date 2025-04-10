@@ -20,7 +20,7 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 <details>
 <summary><strong>Click to view actual models and algorithms</strong></summary>
 
-- Uses OpenAI Embeddings: [OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings)
+- Uses OpenAI Embeddings: [OpenAI's text-embedding-3-small](https://platform.openai.com/docs/guides/embeddings)
 
 - Preprocessing: L2 Normalization (for Euclidean distance) + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)(to reduce UMAP memory usage) 
 
@@ -304,7 +304,7 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 
 ```python
 
-#Converts each message into a 3072-dimensional vector using OpenAI's text-embedding-3-large.
+#Converts each message into a 1536-dimensional vector using OpenAI's text-embedding-3-small.
 get_embeddings(file_df)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
@@ -388,14 +388,14 @@ format_to_dict()
 
 ## Estimated Cost (OpenAI Pricing)
 
-Estimated cost: **$0.13 to $0.28 per 1 million tokens**.
+Estimated cost: **$0.02 to $0.17 per 1 million tokens**.
 
-Example: A CSV containing 1,000 Reddit comments costs approximately **$0.01** to process.
+Example: A CSV containing 1,000, all greater than one sentence long, Reddit comments costs approximately **$0.01** to process.
 
 <details>
 <summary><strong>Click for pricing details</strong></summary>
 
-The OpenAI text-embedding-3-large model costs approximately $0.13 per 1 million input tokens. Determined by the total tokens of your input textual messages.
+The OpenAI text-embedding-3-small model costs approximately $0.02 per 1 million input tokens. Determined by the total tokens of your input textual messages.
 
 The Chat Completions model used for summarization (gpt-4o-mini) is $0.15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
 
