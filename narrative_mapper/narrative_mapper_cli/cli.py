@@ -48,11 +48,11 @@ def get_cluster_params(df, verbose=False):
     #n_components ~ constant to N. 
     n_components = 10
 
-    #n_neighbors ~ sqrt(N). range [15, 75]
-    n_neighbors = int(min(75, max(15, 15*sqrt(N))))
+    #n_neighbors ~ sqrt(N). range [20, 75]
+    n_neighbors = int(min(75, max(20, 20*sqrt(N))))
 
-    #min_cluster_size ~ sqrt(N). range [10, 200]
-    min_cluster_size = int(min(200, max(10, 10*sqrt(N))))
+    #min_cluster_size ~ sqrt(N). range [30, 200]
+    min_cluster_size = int(min(200, max(30, 30*sqrt(N))))
 
     #min_samples ~ log2(N). range [5, 30]
     min_samples = int(min(30, max(5, 5*log2(N))))
@@ -119,4 +119,3 @@ def main():
     mapper = run_mapper(df, args.online_group_name, cluster_params, args.verbose)
     output = mapper.format_to_dict()["clusters"]
     write_log(output, args.online_group_name, args.file_output)
-    mapper.format_by_cluster().to_csv("testing.csv", index=False)

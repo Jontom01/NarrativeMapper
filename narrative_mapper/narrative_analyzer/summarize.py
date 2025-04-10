@@ -27,10 +27,13 @@ def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
     #aggregate by majority label: count POSITIVE and NEGATIVE, then decide overall
     pos_count = sum(1 for s in sentiments if s["label"] == "POSITIVE")
     neg_count = sum(1 for s in sentiments if s["label"] == "NEGATIVE")
-    count_ratio = pos_count/neg_count
-    if count_ratio > 2:
+
+    if neg_count == 0 and pos_count == 0: raise Exception("No sentiments calculated in batch")
+    count_ratio = 2 if (neg_count == 0) else pos_count/neg_count
+    
+    if count_ratio >= 2:
         overall = "POSITIVE"
-    elif count_ratio < 0.5:
+    elif count_ratio <= 0.5:
         overall = "NEGATIVE"
     else:
         overall = "NEUTRAL"
