@@ -25,8 +25,9 @@ def parse_args():
     parser.add_argument("file_name", type=str, help="file path")
     parser.add_argument("online_group_name", type=str, help="online group name")
     #FLAGS
-    parser.add_argument("--verbose", action="store_true", help="Print detailed parameter scaling info")
-    parser.add_argument("--file-output", action="store_true", help="Output summaries to text file")
+    parser.add_argument("--verbose", action="store_true", help="Print/show detailed parameter scaling info and progress bars.")
+    parser.add_argument("--file-output", action="store_true", help="Output summaries to text file in working directory.")
+    parser.add_argument("--max-samples", type=int, default=500, help="Max amount of texts samples from clusters being used in summarization.")
     return parser.parse_args()
 
 
@@ -74,7 +75,7 @@ def get_cluster_params(df, verbose=False):
 
     return params
 
-def run_mapper(df, group_name, cluster_params, verbose):
+def run_mapper(df, group_name, cluster_params, verbose, max_sample_size=500):
     '''
     Runs NarrativeMapper logic to obtain main narratives/topics and sentiments.
     '''
@@ -87,7 +88,7 @@ def run_mapper(df, group_name, cluster_params, verbose):
         min_samples=cluster_params['min_samples'],
         umap_kwargs={"min_dist": 0.0, "low_memory": True}
     )
-    mapper.summarize(max_sample_size=500)
+    mapper.summarize(max_sample_size=max_sample_size)
     return mapper
 
 def write_log(output, group_name, file_output):
@@ -116,6 +117,6 @@ def main():
     args = parse_args()
     df = load_data(args.file_name)
     cluster_params = get_cluster_params(df, verbose=args.verbose)
-    mapper = run_mapper(df, args.online_group_name, cluster_params, args.verbose)
+    mapper = run_mapper(df, args.online_group_name, cluster_params, args.verbose, max_sample_size=args.max_samples)
     output = mapper.format_to_dict()["clusters"]
     write_log(output, args.online_group_name, args.file_output)

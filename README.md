@@ -125,9 +125,11 @@ Comments: 86
 narrativemapper path/to/your.csv online_group_name --verbose --file-output
 ```
 
-- **verbose:** - Shows full verbose, including progress bars and cluster parameter values.
+- **verbose:** - Print/show detailed parameter scaling info and progress bars.
 
-- **file-output:** - Outputs topic summaries to a file with *online_group_name*_NarrativeMapper.txt in working directory (like the above output example).
+- **file-output:** - Output summaries to text file in working directory.
+
+- **max-samples:** - Max amount of texts samples from clusters being used in summarization.
 </details>
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
