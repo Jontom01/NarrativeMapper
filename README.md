@@ -122,7 +122,7 @@ Comments: 86
 <summary><strong>Click to view</strong></summary>
 
 ```bash
-narrativemapper path/to/your.csv online_group_name --verbose --file-output
+narrativemapper path/to/your.csv online_group_name --verbose --file-output --max-samples
 ```
 
 - **verbose:** - Print/show detailed parameter scaling info and progress bars.

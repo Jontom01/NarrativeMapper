@@ -10,12 +10,13 @@ load_dotenv()
 #TO USE:
 #1. Create reddit application to use praw (this is free you just have to set it up).
 #2. Put the following three variables in an .env file (with the values you received from creating a reddit application).
+
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID")
 REDDIT_USER_AGENT = os.getenv("REDDIT_USER_AGENT")
 
 def scrape_subreddit(
-    subreddit_name_list: list[str], 
+    subreddit_names: list[str], 
     submission_limit: int=10, 
     comment_limit: int=10, 
     time_filter: str="year", 
@@ -32,19 +33,18 @@ def scrape_subreddit(
     time_created_list = []
     comment_id_list = []
     subreddit_list = []
-    subredditVar = reddit.subreddit(subreddit_name)
-    progress_context_sentiment = (
-    Progress(
-        SpinnerColumn(),
-        TextColumn("[bold cyan]{task.description}"),
-        BarColumn(),
-        TimeElapsedColumn()
-        ))
+
     for subreddit_name in subreddit_names:
-        print(subreddit_name)
         subredditVar = reddit.subreddit(subreddit_name)
+        progress_context_sentiment = (
+        Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]{task.description}"),
+            BarColumn(),
+            TimeElapsedColumn()
+            ))
         with progress_context_sentiment as progress:
-            task = progress.add_task(f"[cyan]Scraping {subreddit_name}...", total=submission_limit)
+            task = progress.add_task(f"[cyan]Scraping r/{subreddit_name}...", total=submission_limit)
             for submission in subredditVar.top(time_filter=time_filter, limit=submission_limit): #get submission objects from subreddit object
                 #submission.comment_sort = 'new'
                 comments_in_post = submission.comments #get comment objects from submission object
@@ -57,7 +57,7 @@ def scrape_subreddit(
                         comment_list.append(comments_in_post[i].body)
                         time_created_list.append(comments_in_post[i].created_utc)
                         comment_id_list.append(comments_in_post[i].id)
-                subreddit_list += [subreddit_name] * num_of_comments_to_grab
+                        subreddit_list.append(subreddit_name)
                 progress.update(task, advance=1)
 
     df = pd.DataFrame({
@@ -71,6 +71,6 @@ def scrape_subreddit(
 
 if __name__ == "__main__":
 
-    subreddit_name = ["politics", "antiwork"]
+    subreddit_names = ["politics", "antiwork"]
     
-    scrape_subreddit(subreddit_name, submission_limit=500, comment_limit=10, file_name="HUGE_comment_data_politics_.csv")
+    scrape_subreddit(subreddit_names, submission_limit=5, comment_limit=10, file_name="scraper_test.csv")
