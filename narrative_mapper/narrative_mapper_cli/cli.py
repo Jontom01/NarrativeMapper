@@ -119,4 +119,3 @@ def main():
     mapper = run_mapper(df, args.online_group_name, cluster_params, args.verbose)
     output = mapper.format_to_dict()["clusters"]
     write_log(output, args.online_group_name, args.file_output)
-    mapper.format_by_cluster().to_csv("testing.csv", index=False)
