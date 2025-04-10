@@ -113,6 +113,18 @@ Sentiment: NEGATIVE
 Comments: 86
 ---
 ```
+**Flag Options:**
+<details>
+<summary><strong>Click to view</strong></summary>
+
+```bash
+narrativemapper path/to/your.csv online_group_name --verbose --file-output
+```
+
+- **verbose:** - Shows full verbose, including progress bars and cluster parameter values.
+
+- **file-output:** - Outputs topic summaries to a file with *online_group_name*_NarrativeMapper.txt in working directory (like the above output example).
+</details>
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
 
@@ -321,7 +333,8 @@ format_by_text(summary_df)
 
 ```python
 class NarrativeMapper:
-    def __init__(self, df, online_group_name: str):
+    def __init__(self, df, online_group_name: str, verbose=False):
+        self.verbose               # Verbose for all parts of the pipeline
         self.file_df               # DataFrame of csv file
         self.online_group_name     # Name of the online community or data source
         self.embeddings_df         # DataFrame after embedding

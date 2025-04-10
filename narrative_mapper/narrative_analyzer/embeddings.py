@@ -1,5 +1,4 @@
 from openai import OpenAI
-from sklearn.preprocessing import normalize
 from .utils import get_openai_key, batch_list
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
 from contextlib import nullcontext
@@ -7,6 +6,7 @@ import pandas as pd
 import re
 
 def clean_texts(text_list: list[str]):
+    #Can make this more robust
     for text in text_list:
         text = text.strip()
         text = re.sub(r'\s+', ' ', text)
@@ -63,7 +63,6 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
             if verbose:
                 progress.update(task, advance=len(batch))
 
-    normalize_embeddings = normalize(embeddings_list, norm='l2') #since both UMAP + HDBSCAN are setup for cosine similarity
-    df['embeddings'] = normalize_embeddings.tolist()
+    df['embeddings'] = embeddings_list
 
     return df

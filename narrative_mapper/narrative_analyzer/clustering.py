@@ -1,5 +1,6 @@
 from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import normalize
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from contextlib import nullcontext
 import umap.umap_ as umap
@@ -36,7 +37,9 @@ def cluster_embeddings(
         pd.DataFrame: DataFrame of clustered items with a 'cluster' column.
     """
     embeddings = df['embeddings'].tolist()
-    
+
+    embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
+
     #PCA so UMAP doesn't assassinate my memory
     pca = PCA(n_components=100)
     reduced_embeddings = pca.fit_transform(embeddings)
@@ -59,7 +62,7 @@ def cluster_embeddings(
         umap_reducer = umap.UMAP(
             n_neighbors=n_neighbors,
             n_components=n_components,
-            metric='cosine',
+            metric='euclidean',
             **umap_kwargs       
         )
         reduced_embeddings = umap_reducer.fit_transform(reduced_embeddings)
@@ -67,10 +70,6 @@ def cluster_embeddings(
         if verbose:
             progress.update(task, advance=1)
     
-
-    distance_matrix = pairwise_distances(reduced_embeddings, metric='cosine')
-    distance_matrix = distance_matrix.astype('float64')
-
     #HDBSCAN clustering:
     progress_context_hdbscan = (
     Progress(
@@ -89,10 +88,10 @@ def cluster_embeddings(
         clusterer = hdbscan.HDBSCAN(
             min_cluster_size=min_cluster_size,
             min_samples=min_samples,
-            metric='precomputed',
+            metric='euclidean',
             **hdbscan_kwargs
         )
-        cluster_labels = clusterer.fit_predict(distance_matrix)
+        cluster_labels = clusterer.fit_predict(reduced_embeddings)
 
         if verbose:
             progress.update(task, advance=1)
