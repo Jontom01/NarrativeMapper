@@ -152,7 +152,7 @@ def cluster_embeddings(
 
     df = df.copy() #may not need this
     df['cluster'] = cluster_labels.tolist()
-    df = df[df['cluster'] != -1]
+    df = df[df['cluster'] != -1] #drop noise cluster
 
     merged_df = merge_clusters_union_find(
         df,

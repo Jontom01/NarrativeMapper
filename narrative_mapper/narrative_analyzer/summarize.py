@@ -30,7 +30,7 @@ def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
 
     if neg_count == 0 and pos_count == 0: raise Exception("No sentiments calculated in batch")
     count_ratio = 2 if (neg_count == 0) else pos_count/neg_count
-    
+
     if count_ratio >= 2:
         overall = "POSITIVE"
     elif count_ratio <= 0.5:
@@ -84,7 +84,7 @@ def extract_summary_for_cluster(texts: list[str]) -> str:
     {combined_summaries}
     ---
     Synthesize them into **one precise sentence** summarizing the main topic(s).
-    Avoid redundancy and avoid vague language. Be specific.
+    Avoid redundancy and avoid vague language. Be specific. If summaries are too broadly unrelated, mention this (call it noisy cluster).
     """
 
     final_response = client.chat.completions.create(
