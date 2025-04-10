@@ -122,14 +122,16 @@ Comments: 86
 <summary><strong>Click to view</strong></summary>
 
 ```bash
-narrativemapper path/to/your.csv online_group_name --verbose --file-output --max-samples
+narrativemapper path/to/your.csv online_group_name --verbose --file-output --max-samples int --random-state int
 ```
 
 - **verbose:** - Print/show detailed parameter scaling info and progress bars.
 
 - **file-output:** - Output summaries to text file in working directory.
 
-- **max-samples:** - Max amount of texts samples from clusters being used in summarization.
+- **max-samples:** - Max amount of texts samples from clusters being used in summarization. Default is 500.
+
+- **random-state:** - Sets value to UMAP and PCA random state. Default value is None. Try different numbers if you want varying results on the same dataset.
 </details>
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
@@ -153,7 +155,7 @@ mapper.load_embeddings()
 
 #clustering: main UMAP and HDBSCAN variables along with kwargs for more customizability.
 umap_kwargs =  {'min_dist': 0.0}
-mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, umap_kwargs=umap_kwargs)
+mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, random_state=None, umap_kwargs=umap_kwargs)
 
 #summarize each cluster's topic and sentiment
 mapper.summarize(max_sample_size=500)
@@ -356,7 +358,8 @@ cluster(
     n_components=..., 
     n_neighbors=..., 
     min_cluster_size=..., 
-    min_samples=..., 
+    min_samples=...,
+    random_state=..., 
     umap_kwargs=..., 
     hdbscan_kwargs=...
     )
@@ -378,6 +381,8 @@ format_to_dict()
 - **min_cluster_size:** In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
 
 - **min_samples:** A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
+
+- **random_state:** Determines the randomness seed for both PCA and UMAP.
 
 - **umap_kwargs:** Allows for input of other UMAP parameters.
 

@@ -68,6 +68,7 @@ def cluster_embeddings(
     min_cluster_size=40, 
     min_samples=15,
     verbose=False,
+    random_state=None,
     umap_kwargs=None,
     hdbscan_kwargs=None
     ) -> pd.DataFrame:
@@ -86,6 +87,7 @@ def cluster_embeddings(
         n_neighbors (int): Number of neighbors for UMAP.
         min_cluster_size (int): Minimum cluster size for HDBSCAN.
         min_samples (int): Minimum samples for HDBSCAN.
+        random_state (int): Determines the randomness seed for both PCA and UMAP.
         umap_kwargs (dict): Allows for more UMAP input parameters
         hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
 
@@ -96,7 +98,7 @@ def cluster_embeddings(
     embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
 
     #PCA so UMAP doesn't assassinate my memory
-    pca = PCA(n_components=100)
+    pca = PCA(n_components=100, random_state=random_state)
     reduced_embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
 
     #UMAP dimensionality:
@@ -119,6 +121,7 @@ def cluster_embeddings(
             n_neighbors=n_neighbors,
             n_components=n_components,
             metric='euclidean',
+            random_state=random_state,
             **umap_kwargs       
         )
         reduced_embeddings = umap_reducer.fit_transform(reduced_embeddings)

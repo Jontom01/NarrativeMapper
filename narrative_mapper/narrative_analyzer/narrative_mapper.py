@@ -47,6 +47,7 @@ class NarrativeMapper:
         n_neighbors: int=20,
         min_cluster_size: int=40, 
         min_samples: int=15,
+        random_state=None,
         umap_kwargs=None,
         hdbscan_kwargs=None
         ) -> "NarrativeMapper":
@@ -59,6 +60,9 @@ class NarrativeMapper:
             n_neighbors (int): Number of neighbors for UMAP.
             min_cluster_size (int): Minimum cluster size for HDBSCAN.
             min_samples (int): Minimum samples for HDBSCAN.
+            umap_kwargs (dict): Allows for more UMAP input parameters
+            hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
+            random_state (int): Determines the randomness seed for both PCA and UMAP.
         
         Returns:
             NarrativeMapper: Self, with clustering results stored.
@@ -70,6 +74,7 @@ class NarrativeMapper:
             min_cluster_size=min_cluster_size,
             min_samples=min_samples,
             verbose=self.verbose,
+            random_state=random_state,
             umap_kwargs=umap_kwargs,
             hdbscan_kwargs=hdbscan_kwargs
         )
