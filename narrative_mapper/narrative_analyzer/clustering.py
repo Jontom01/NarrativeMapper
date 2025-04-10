@@ -1,4 +1,4 @@
-from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.metrics.pairwise import pairwise_distances, cosine_distances
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import normalize
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
@@ -6,6 +6,60 @@ from contextlib import nullcontext
 import umap.umap_ as umap
 import hdbscan
 import pandas as pd
+import numpy as np
+import warnings
+
+def merge_clusters_union_find(df, threshold=0.2, embedding_col='embeddings', cluster_col='cluster'):
+    '''
+    Union Find algorithm to merge alike clusters. The algorithm requires state to be held, so
+    using a class makes it cleaner.
+    '''
+    class UnionFind:
+        def __init__(self, items):
+            #each item is its own parent initially
+            self.parent = {item: item for item in items}
+        
+        def find(self, x):
+            #path compression
+            if self.parent[x] != x:
+                self.parent[x] = self.find(self.parent[x])
+            return self.parent[x]
+        
+        def union(self, x, y):
+            rootX = self.find(x)
+            rootY = self.find(y)
+            if rootX != rootY:
+                #attach one's root to the other's root
+                self.parent[rootY] = rootX
+        
+    #compute centroids
+    centroids = {}
+    for c_id in df[cluster_col].unique():
+        emb = np.vstack(df.loc[df[cluster_col] == c_id, embedding_col])
+        centroids[c_id] = emb.mean(axis=0)
+    
+    #compute pairwise distances
+    ids = list(centroids.keys())
+    vectors = [centroids[cid] for cid in ids]
+    dists = cosine_distances(vectors)
+    
+    #initialize Union-Find structure
+    uf = UnionFind(ids)
+    
+    #for each close pair, union them
+    n = len(ids)
+    for i in range(n):
+        for j in range(i+1, n):
+            if dists[i, j] < threshold:
+                uf.union(ids[i], ids[j])
+    
+    #reassign cluster IDs based on the union-find root
+    new_labels = {}
+    for c_id in ids:
+        new_labels[c_id] = uf.find(c_id)
+    
+    df[cluster_col] = [new_labels[c] for c in df[cluster_col]]
+    return df
 
 def cluster_embeddings(
     df, 
@@ -37,7 +91,6 @@ def cluster_embeddings(
         pd.DataFrame: DataFrame of clustered items with a 'cluster' column.
     """
     embeddings = df['embeddings'].tolist()
-
     embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
 
     #PCA so UMAP doesn't assassinate my memory
@@ -59,6 +112,7 @@ def cluster_embeddings(
         if umap_kwargs == None:
             umap_kwargs = {}
 
+        warnings.filterwarnings("ignore", message=".*n_jobs value 1 overridden.*")
         umap_reducer = umap.UMAP(
             n_neighbors=n_neighbors,
             n_components=n_components,
@@ -96,8 +150,13 @@ def cluster_embeddings(
         if verbose:
             progress.update(task, advance=1)
 
-    df = df.copy()
+    df = df.copy() #may not need this
     df['cluster'] = cluster_labels.tolist()
     df = df[df['cluster'] != -1]
 
-    return df
+    merged_df = merge_clusters_union_find(
+        df,
+        threshold=0.3  #similarity cutoff
+    )
+    
+    return merged_df

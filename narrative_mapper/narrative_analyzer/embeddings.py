@@ -6,14 +6,11 @@ import pandas as pd
 import re
 
 def clean_texts(text_list: list[str]):
-    #Can make this more robust
-    for text in text_list:
-        text = text.strip()
-        text = re.sub(r'\s+', ' ', text)
-        text = re.sub(r'https?://\S+', '', text)
-        text = re.sub(r'<.*?>', '', text)
-        text = re.sub(r'@\w+', '', text)
-    return text_list
+    #can eventually make this more robust
+    return [
+        re.sub(r'@\w+', '', re.sub(r'<.*?>', '', re.sub(r'https?://\S+', '', text.strip())))
+        for text in text_list
+    ]
 
 def get_embeddings(df, verbose=False) -> pd.DataFrame:
     """

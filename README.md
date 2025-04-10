@@ -18,15 +18,19 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 - Plug-and-play pipeline: **CLI**, class-based, or functional
 
 <details>
-<summary><strong>Click to view actual models being used</strong></summary>
+<summary><strong>Click to view actual models and algorithms</strong></summary>
 
-- Uses OpenAI Embeddings ([OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings))
+- Uses OpenAI Embeddings: [OpenAI's text-embedding-3-large](https://platform.openai.com/docs/guides/embeddings)
 
-- Dimensionality reduction ([UMAP](https://umap-learn.readthedocs.io/en/latest/))
+- Preprocessing: L2 Normalization (for Euclidean distance) + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)(to reduce UMAP memory usage) 
 
-- Density-based clustering ([HDBSCAN](https://hdbscan.readthedocs.io/en/latest/))
+- Dimensionality reduction: [UMAP](https://umap-learn.readthedocs.io/en/latest/)
 
-- Topic summary + sentiment extraction ([OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english))
+- Clustering: [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/)
+
+- Cluster Merging: Union-find algorithm
+
+- Topic summary + sentiment extraction: [OpenAI's Chat Completions API](https://platform.openai.com/docs/guides/gpt), model gpt-4o-mini + [Hugging Face's distilbert-base-uncased-finetuned-sst-2-english](https://huggingface.co/distilbert-base-uncased-finetuned-sst-2-english)
 </details>
 
 ## Installation and Setup

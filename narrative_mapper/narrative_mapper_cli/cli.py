@@ -37,6 +37,9 @@ def load_data(file_path):
     return df
 
 def get_cluster_params(df, verbose=False):
+    '''
+    Autocalculates UMAP and HDBSCAN parameters based off of 'text' col size.
+    '''
     text_list = df['text'].tolist()
     num_texts = len(text_list)
     base_num_texts = 500
@@ -45,14 +48,14 @@ def get_cluster_params(df, verbose=False):
     #n_components ~ constant to N. 
     n_components = 10
 
-    #n_neighbors ~ sqrt(N). range [10, 60]
-    n_neighbors = int(min(60, max(10, 10*sqrt(N))))
+    #n_neighbors ~ sqrt(N). range [15, 75]
+    n_neighbors = int(min(75, max(15, 15*sqrt(N))))
 
-    #min_cluster_size ~ sqrt(N). range [15, 200]
-    min_cluster_size = int(min(200, max(15, 15*sqrt(N))))
+    #min_cluster_size ~ sqrt(N). range [10, 200]
+    min_cluster_size = int(min(200, max(10, 10*sqrt(N))))
 
-    #min_samples ~ log2(N). range [5, 20]
-    min_samples = int(min(20, max(5, 5*log2(N))))
+    #min_samples ~ log2(N). range [5, 30]
+    min_samples = int(min(30, max(5, 5*log2(N))))
 
     params = {
         "n_neighbors": n_neighbors,
@@ -72,6 +75,9 @@ def get_cluster_params(df, verbose=False):
     return params
 
 def run_mapper(df, group_name, cluster_params, verbose):
+    '''
+    Runs NarrativeMapper logic to obtain main narratives/topics and sentiments.
+    '''
     mapper = NarrativeMapper(df, group_name, verbose)
     mapper.load_embeddings()
     mapper.cluster(
@@ -85,6 +91,9 @@ def run_mapper(df, group_name, cluster_params, verbose):
     return mapper
 
 def write_log(output, group_name, file_output):
+    '''
+    Output logic. Prints to file if user uses --file-output flag.
+    '''
     log_path = f"{group_name}_NarrativeMapper.txt"
     handlers = [logging.StreamHandler()]
     if file_output:
@@ -101,6 +110,9 @@ def write_log(output, group_name, file_output):
         logging.info("---")
 
 def main():
+    '''
+    Main function that runs pipeline.
+    '''
     args = parse_args()
     df = load_data(args.file_name)
     cluster_params = get_cluster_params(df, verbose=args.verbose)
