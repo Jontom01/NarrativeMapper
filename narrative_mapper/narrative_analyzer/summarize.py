@@ -101,8 +101,8 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
     Summarizes each text cluster by extracting the narrative and sentiment analysis of each cluster.
 
     Given a DataFrame of clustered text (as returned by `cluster_embeddings`), this function:
-    - Samples up to 500 comments per cluster
-    - Uses OpenAI Chat Completions to generate a one-line summary of each cluster's main theme
+    - Samples up to max_sample_size messages per cluster
+    - Uses OpenAI Chat Completions to generate a one-line summary of each cluster's main theme (2-stages)
     - Applies a Hugging Face sentiment model to determine overall cluster sentiment
 
     Parameters:

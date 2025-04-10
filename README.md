@@ -91,7 +91,7 @@ This will:
 
 - Print the summarized narratives and sentiment to the terminal
 
-File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/comment_data/comment_data_politics_1200.csv):
+File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_politics_1200.csv):
 
 ```txt
 Run Timestamp: 2025-04-09 01:46:44
@@ -273,7 +273,7 @@ The three formatter functions return the following:
 
 </details>
 
-[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_2.csv)
+[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/example_outputs/test_2.csv)
 
 **format_by_text()** returns pandas DataFrame with columns:
 
@@ -292,7 +292,7 @@ The three formatter functions return the following:
 
 </details>
 
-[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/unrelated_to_package/example_outputs/test_1.csv)
+[CSV to show output format](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/example_outputs/test_1.csv)
 
 
 ## Pipeline Architecture & API Overview
