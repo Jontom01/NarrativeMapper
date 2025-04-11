@@ -136,12 +136,11 @@ mapper = NarrativeMapper(file_df, "online_group_name", verbose=True)
 #embeds semantic vectors
 mapper.load_embeddings()
 
-#clustering: has default UMAP and HDBSCAN parameters set but has kwargs for more customizability.
-umap_kwargs =  {'n_components': 10, 'min_dist': 0.0}
-mapper.cluster(umap_kwargs=**umap_kwargs, use_pca=False)
+#clustering with default parameters.
+mapper.cluster() #Refer to Parameter Reference for optional kwargs
 
-#summarize each cluster's topic and sentiment
-mapper.summarize(max_sample_size=500)
+#summarizing with default parameters.
+mapper.summarize() #Has max_sample_size param (refer to Parameter Reference)
 
 #export in your preferred format
 summary_dict = mapper.format_to_dict()
@@ -276,25 +275,45 @@ The three formatter functions return the following:
 ```txt
 CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```
+
+**Parameter Reference:**
+
+<details>
+<summary>Click to expand</summary>
+
+- **verbose:** Print/show detailed parameter scaling info and progress bars.
+
+- **use_pca:** Toggle whether or not you want to use PCA before UMAP (default is True since it helps reduce RAM usage from UMAP).
+
+- **umap_kwargs:** Allows for input of UMAP parameters.
+
+- **hdbscan_kwags:** Allows for input of HDBSCAN parameters.
+
+- **pca_kwargs:** Allows for input of PCA parameters.
+
+- **max_sample_size:** Max length of text list for each cluster being sampled.
+
+</details>
+
 **Functions:**
 
 ```python
 
 #Converts each message into a 1536-dimensional vector using OpenAI's text-embedding-3-small.
-get_embeddings(file_df, verbose=...)
+get_embeddings(file_df, verbose=bool)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 cluster_embeddings(
     embeddings, 
-    verbose=..., 
-    use_pca=...,
-    pca_kwargs=..., 
-    umap_kwargs=..., 
-    hdbscan_kwags=...
+    verbose=bool, 
+    use_pca=bool,
+    pca_kwargs=dict, 
+    umap_kwargs=dict, 
+    hdbscan_kwags=dict
     )
 
 #Uses GPT (via Chat Completions) for cluster summaries and Hugging Face's distilbert for sentiment analysis.
-summarize_clusters(clustered_df, max_sample_size=..., verbose=...)
+summarize_clusters(clustered_df, max_sample_size=int, verbose=bool)
 
 #Returns structured output as a dictionary (ideal for JSON export).
 format_to_dict(summary_df)
@@ -326,33 +345,16 @@ class NarrativeMapper:
 ```python
 load_embeddings()
 cluster(
-    use_pca=...,
-    pca_kwargs=..., 
-    umap_kwargs=..., 
-    hdbscan_kwargs=...
+    use_pca=bool,
+    pca_kwargs=dict, 
+    umap_kwargs=dict, 
+    hdbscan_kwargs=dict
     )
-summarize(max_sample_size=...)
+summarize(max_sample_size=int)
 format_by_text()
 format_by_cluster()
 format_to_dict()
 ```
-
-### Parameter Reference
-
-<details>
-<summary>Click to expand</summary>
-
-- **verbose:** Print/show detailed parameter scaling info and progress bars.
-
-- **use_pca:** Toggle whether or not you want to use PCA before UMAP (default is True since it helps reduce RAM usage from UMAP).
-
-- **umap_kwargs:** Allows for input of UMAP parameters.
-
-- **hdbscan_kwags:** Allows for input of HDBSCAN parameters.
-
-- **pca_kwargs:** Allows for input of PCA parameters.
-
-</details>
 
 
 ## Estimated Cost (OpenAI Pricing)
