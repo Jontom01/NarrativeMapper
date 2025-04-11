@@ -131,7 +131,7 @@ import pandas as pd
 file_df = pd.read_csv("file-path")
 
 #initialize NarrativeMapper object
-mapper = NarrativeMapper(file_df, "r/antiwork", verbose=True)
+mapper = NarrativeMapper(file_df, "online_group_name", verbose=True)
 
 #embeds semantic vectors
 mapper.load_embeddings()
@@ -149,8 +149,8 @@ text_df = mapper.format_by_text()
 cluster_df = mapper.format_by_cluster()
 
 #saving DataFrames to csv
-text_df.to_csv("comments_by_cluster.csv", index=False)
-cluster_df.to_csv("cluster_summary.csv", index=False)
+text_df.to_csv("by_texts_summary.csv", index=False)
+cluster_df.to_csv("by_cluster_summary.csv", index=False)
 ```
 
 ### Option 3: Functional Interface
@@ -170,14 +170,14 @@ cluster_df = cluster_embeddings(embeddings)
 summary_df = summarize_clusters(cluster_df)
 
 #export/format options
-summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
-text_df = format_by_text(summary_df, online_group_name="r/antiwork")
-cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
+summary_dict = format_to_dict(summary_df, online_group_name="online_group_name")
+text_df = format_by_text(summary_df, online_group_name="online_group_name")
+cluster_df = format_by_cluster(summary_df, online_group_name="online_group_name")
 ```
 
 ## Output Formats
 
-This example is based off of [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_antiwork_1800.csv)
+The following example outputs are based off of [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_antiwork_1800.csv).
 
 The three formatter functions return the following:
 
