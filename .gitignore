@@ -6,3 +6,4 @@ build/
 *.egg-info/
 test_package.py
 dev/
+.vscode/
