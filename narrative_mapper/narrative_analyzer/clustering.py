@@ -8,6 +8,7 @@ import hdbscan
 import pandas as pd
 import numpy as np
 import warnings
+import sys
 
 def merge_clusters_union_find(df, threshold=0.2, embedding_col='embeddings', cluster_col='cluster'):
     '''
@@ -70,7 +71,7 @@ def cluster_embeddings(
     use_pca=True
     ) -> pd.DataFrame:
     """
-    Preprocesses using L2 normalization and PCA to 100 dim.
+    Preprocesses using L2 normalization and PCA.
 
     Reduces dimensionality of embedding vectors using UMAP and clusters them using HDBSCAN.
 
@@ -80,72 +81,85 @@ def cluster_embeddings(
 
     Parameters:
         df (DataFrame): DataFrame with embeddings column.
+        verbose (bool): Shows progress timer if true.
         umap_kwargs (dict): Allows for more UMAP input parameters
         hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
         pca_kwargs (dict): Allows for more PCA input parameters
         use_pca (bool): Allows user to not use PCA and go straight to UMAP
 
     Returns:
-        pd.DataFrame: DataFrame of clustered items with a 'cluster' column.
+        DataFrame: DataFrame of clustered items with a 'cluster' column.
     """
     embeddings = np.array(df['embeddings'].tolist(), dtype=np.float32) #convert to np.array with float32 vals for less mem usage
     embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
 
     #PCA so UMAP doesn't assassinate my memory
     if use_pca:
-        pca = PCA(**pca_kwargs)
-        embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
+        try:
+            pca = PCA(**pca_kwargs)
+            embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
+
+        except Exception as e:
+            print(f"Error during PCA: {e}")
+            sys.exit(1)
 
     #UMAP dimensionality:
-    progress_context_umap = (
-    Progress(
-        SpinnerColumn(),
-        TextColumn("[bold cyan]{task.description}"),
-        TimeElapsedColumn()
-        ) if verbose else nullcontext()
-    )
-    with progress_context_umap as progress:
-        if verbose:
-            task = progress.add_task("[cyan]UMAP reducing dimensions...", total=1)
-
-        warnings.filterwarnings("ignore", message=".*n_jobs value 1 overridden.*")
-        umap_reducer = umap.UMAP(
-            metric='euclidean',
-            **umap_kwargs       
+    try:
+        progress_context_umap = (
+        Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]{task.description}"),
+            TimeElapsedColumn()
+            ) if verbose else nullcontext()
         )
-        embeddings = umap_reducer.fit_transform(embeddings)
+        with progress_context_umap as progress:
+            if verbose:
+                task = progress.add_task("[cyan]UMAP reducing dimensions...", total=1)
 
-        if verbose:
-            progress.update(task, advance=1)
- 
+            warnings.filterwarnings("ignore", message=".*n_jobs value 1 overridden.*")
+            umap_reducer = umap.UMAP(
+                metric='euclidean',
+                **umap_kwargs       
+            )
+            embeddings = umap_reducer.fit_transform(embeddings)
+
+            if verbose:
+                progress.update(task, advance=1)
+
+    except Exception as e:
+        print(f"Error during UMAP: {e}")
+        sys.exit(1)
+
     #HDBSCAN clustering:
-    progress_context_hdbscan = (
-    Progress(
-        SpinnerColumn(),
-        TextColumn("[bold cyan]{task.description}"),
-        TimeElapsedColumn()
-        ) if verbose else nullcontext()
-    )
-    with progress_context_hdbscan as progress:
-        if verbose:
-            task = progress.add_task("[cyan]HDBSCAN clustering...", total=1)
-
-        clusterer = hdbscan.HDBSCAN(
-            metric='euclidean',
-            **hdbscan_kwargs
+    try:
+        progress_context_hdbscan = (
+        Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]{task.description}"),
+            TimeElapsedColumn()
+            ) if verbose else nullcontext()
         )
-        cluster_labels = clusterer.fit_predict(embeddings)
+        with progress_context_hdbscan as progress:
+            if verbose:
+                task = progress.add_task("[cyan]HDBSCAN clustering...", total=1)
 
-        if verbose:
-            progress.update(task, advance=1)
+            clusterer = hdbscan.HDBSCAN(
+                metric='euclidean',
+                **hdbscan_kwargs
+            )
+            cluster_labels = clusterer.fit_predict(embeddings)
+
+            if verbose:
+                progress.update(task, advance=1)
+
+    except Exception as e:
+        print(f"Error during HDBSCAN: {e}")
+        sys.exit(1)
 
     df = df.copy() #may not need this
     df['cluster'] = cluster_labels.tolist()
     df = df[df['cluster'] != -1] #drop noise cluster
 
-    merged_df = merge_clusters_union_find(
-        df,
-        threshold=0.3  #similarity cutoff
-    )
+    merged_df = merge_clusters_union_find(df, threshold=0.3)  #similarity cutoff 
     
     return merged_df

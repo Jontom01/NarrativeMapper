@@ -7,10 +7,9 @@ import pandas as pd
 class NarrativeMapper:
     """
     A pipeline for processing, clustering, summarizing, and formatting text data.
-    
+
     Methods allow you to load embeddings from a file, perform clustering,
-    generate cluster summaries (using OpenAI Chat Completions and sentiment analysis),
-    and format the results into various output structures.
+    generate cluster summaries, and format the results into various output structures.
     """
     
     def __init__(self, df, online_group_name: str, verbose=False):
@@ -20,6 +19,10 @@ class NarrativeMapper:
         Parameters:
             online_group_name (str): Name of the online community (e.g. subreddit) to label outputs.
             df (DataFrame): The DataFrame of the original file.
+            verbose (bool): Shows all progress bars and timers for all parts of the pipeline.
+            embeddings_df (DataFrame): Contains DataFrame after embeddings.
+            cluster_df (DataFrame): Contains DataFrame after clustering.
+            summary_df (DataFrame): Contains DataFrame after summarizing.
         """
         self.file_df = df
         self.online_group_name = online_group_name
@@ -49,11 +52,10 @@ class NarrativeMapper:
         use_pca=True
         ) -> "NarrativeMapper":
         """
-        Applies UMAP for dimensionality reduction and HDBSCAN for clustering
+        Applies PCA + UMAP for dimensionality reduction and HDBSCAN for clustering
         on the loaded embeddings.
         
         Parameters:
-            df (DataFrame): DataFrame with embeddings column.
             umap_kwargs (dict): Allows for more UMAP input parameters
             hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
             pca_kwargs (dict): Allows for more PCA input parameters

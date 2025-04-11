@@ -1,99 +1,108 @@
 from transformers import pipeline
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 from .utils import get_openai_key, batch_list
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
 from contextlib import nullcontext
 import pandas as pd
 import torch
+import sys
 
-device= 0 if torch.cuda.is_available() else -1
+device = 0 if torch.cuda.is_available() else -1
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
-
 
 def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
     """
     Analyze sentiment for a list of texts using the Hugging Face sentiment pipeline.
     Returns an overall aggregated sentiment and a list of individual sentiment results.
     """
-    sentiments = []
-    for text in texts:
-        try:
-            result = sentiment_analyzer(text, truncation=True)
-            #result is typically a list with one dict: [{'label': 'POSITIVE', 'score': 0.99}]
-            sentiments.append(result[0])
-        except Exception as e:
-            #an case of error, mark it as unknown
-            sentiments.append({"label": "UNKNOWN", "score": 0})
-    #aggregate by majority label: count POSITIVE and NEGATIVE, then decide overall
-    pos_count = sum(1 for s in sentiments if s["label"] == "POSITIVE")
-    neg_count = sum(1 for s in sentiments if s["label"] == "NEGATIVE")
+    try:
+        sentiments = []
+        for text in texts:
+            try:
+                result = sentiment_analyzer(text, truncation=True)
+                #result is typically a list with one dict: [{'label': 'POSITIVE', 'score': 0.99}]
+                sentiments.append(result[0])
+            except Exception as e:
+                #an case of error, mark it as unknown
+                sentiments.append({"label": "UNKNOWN", "score": 0})
+        #aggregate by majority label: count POSITIVE and NEGATIVE, then decide overall
+        pos_count = sum(1 for s in sentiments if s["label"] == "POSITIVE")
+        neg_count = sum(1 for s in sentiments if s["label"] == "NEGATIVE")
 
-    if neg_count == 0 and pos_count == 0: raise Exception("No sentiments calculated in batch")
-    count_ratio = 2 if (neg_count == 0) else pos_count/neg_count
+        if neg_count == 0 and pos_count == 0: raise Exception("No sentiments calculated in batch")
+        count_ratio = 2 if (neg_count == 0) else pos_count/neg_count
 
-    if count_ratio >= 2:
-        overall = "POSITIVE"
-    elif count_ratio <= 0.5:
-        overall = "NEGATIVE"
-    else:
-        overall = "NEUTRAL"
-    return overall, sentiments
+        if count_ratio >= 2:
+            overall = "POSITIVE"
+        elif count_ratio <= 0.5:
+            overall = "NEGATIVE"
+        else:
+            overall = "NEUTRAL"
+        return overall, sentiments
+
+    except Exception as e:
+        print(f"Unexpected error during cluster sentiment analysis: {e}")
+        sys.exit(1)
 
 def extract_summary_for_cluster(texts: list[str]) -> str:
     """
     Summarizes a cluster of semantically similar texts into one precise sentence.
     Uses a two-stage summarization strategy to handle token limits and improve accuracy.
     """
-    client = OpenAI(api_key=get_openai_key())
-    
-    summary_batches = []
-    batches = batch_list(texts, model="gpt-4o-mini", max_tokens=7000)
-    
-    for batch in batches:
-        joined_batch = "\n".join(batch)
+    try:
+        client = OpenAI(api_key=get_openai_key())
+        
+        summary_batches = []
+        batches = batch_list(texts, model="gpt-4o-mini", max_tokens=7000)
+        
+        for batch in batches:
+            joined_batch = "\n".join(batch)
 
-        prompt = f"""
-        You are an expert in discourse analysis and topic summarization.
+            prompt = f"""
+            You are an expert in discourse analysis and topic summarization.
+            Your task is to analyze the following user-generated messages, which were grouped together by semantic similarity using embeddings and clustering.
+            Summarize the *LARGEST recurring themes or central topic(s)* discussed in this cluster using **one short sentence**.
+            Be specific. Avoid vague or generic summaries. Use concrete nouns. If multiple recurring themes are present, combine them concisely. Avoid filler words.
+            ---
+            {joined_batch}
+            ---
+            """
 
-        Your task is to analyze the following user-generated messages, which were grouped together by semantic similarity using embeddings and clustering.
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3
+            )
+            summary = response.choices[0].message.content.strip()
+            summary_batches.append(summary)
 
-        Summarize the *LARGEST recurring themes or central topic(s)* discussed in this cluster using **one short sentence**.
+        combined_summaries = "\n".join(summary_batches)
 
-        Be specific. Avoid vague or generic summaries. Use concrete nouns. If multiple recurring themes are present, combine them concisely. Avoid filler words.
-
+        final_prompt = f"""
+        You are an expert in summarization.
+        Here are partial summaries of different batches from a single conversation cluster:
         ---
-        {joined_batch}
+        {combined_summaries}
         ---
+        Synthesize them into **one precise sentence** summarizing the main topic(s).
+        Avoid redundancy and avoid vague language. Be specific. If summaries are too broadly unrelated, mention this (call it noisy cluster).
         """
 
-        response = client.chat.completions.create(
+        final_response = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
+            messages=[{"role": "user", "content": final_prompt}],
+            temperature=0.2
         )
-        summary = response.choices[0].message.content.strip()
-        summary_batches.append(summary)
 
-    combined_summaries = "\n".join(summary_batches)
+        return final_response.choices[0].message.content.strip()
 
-    final_prompt = f"""
-    You are an expert in summarization.
+    except OpenAIError as e:
+        print(f"OpenAI API error: {e}")
+        sys.exit(1)
 
-    Here are partial summaries of different batches from a single conversation cluster:
-    ---
-    {combined_summaries}
-    ---
-    Synthesize them into **one precise sentence** summarizing the main topic(s).
-    Avoid redundancy and avoid vague language. Be specific. If summaries are too broadly unrelated, mention this (call it noisy cluster).
-    """
-
-    final_response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": final_prompt}],
-        temperature=0.2
-    )
-
-    return final_response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Unexpected error during cluster summarization: {e}")
+        sys.exit(1)
 
 
 def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False) -> pd.DataFrame:
@@ -106,8 +115,9 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
     - Applies a Hugging Face sentiment model to determine overall cluster sentiment
 
     Parameters:
-        df (pd.DataFrame): DataFrame containing clustered text data with a 'cluster' and 'text' column.
-        max_sample_size (int): max length of text list for each cluster being sampled
+        df (DataFrame): DataFrame containing clustered text data with a 'cluster' and 'text' column.
+        max_sample_size (int): max length of text list for each cluster being sampled.
+        verbose (bool): show progress bars if True.
 
     Returns:
         pd.DataFrame: A new DataFrame with columns:
@@ -119,7 +129,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
     """
     df = df.copy()
     df = df.drop(columns=['embeddings'])
-    #group texts by cluster and sample up to 500 texts per cluster
+    #group texts by cluster and sample up to max_sample texts per cluster
     grouped_texts = {}
     grouped = df.groupby('cluster')
     for cluster, group in grouped:

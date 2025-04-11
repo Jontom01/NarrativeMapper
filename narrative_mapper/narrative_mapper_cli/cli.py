@@ -17,6 +17,7 @@ import logging
 import argparse
 import csv
 import pandas as pd
+import sys
 
 #better cluster param calculations, flag options (sample size limiter, batch_size, output file directory)
 def parse_args():
@@ -35,7 +36,15 @@ def parse_args():
 
 
 def load_data(file_path):
-    df = pd.read_csv(file_path)
+    try:
+        df = pd.read_csv(file_path)
+        if 'text' not in df.columns:
+            raise ValueError("Input file must contain a 'text' column.")
+        return df
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to read CSV file: {e}")
+
     if 'text' not in df.columns:
         raise ValueError("Input file must contain a 'text' column.")
     return df
@@ -133,15 +142,20 @@ def main():
     '''
     Main function that runs pipeline.
     '''
-    args = parse_args()
-    df = load_data(args.file_name)
-    param_calcs = get_param_calcs(df, verbose=args.verbose)
-    mapper_args = {
-        'random_state': args.random_state,
-        'max_sample_size': args.max_samples,
-        'no_pca': args.no_pca,
-        'dim_pca': args.dim_pca
-        }
-    mapper = run_mapper(df, args.online_group_name, param_calcs, verbose=args.verbose, **mapper_args)
-    output = mapper.format_to_dict()["clusters"]
-    write_log(output, args.online_group_name, args.file_output)
+    try:
+        args = parse_args()
+        df = load_data(args.file_name)
+        param_calcs = get_param_calcs(df, verbose=args.verbose)
+        mapper_args = {
+            'random_state': args.random_state,
+            'max_sample_size': args.max_samples,
+            'no_pca': args.no_pca,
+            'dim_pca': args.dim_pca
+            }
+        mapper = run_mapper(df, args.online_group_name, param_calcs, verbose=args.verbose, **mapper_args)
+        output = mapper.format_to_dict()["clusters"]
+        write_log(output, args.online_group_name, args.file_output)
+
+    except Exception as e:
+        print(f"Error running CLI: {e}")
+        sys.exit(1)

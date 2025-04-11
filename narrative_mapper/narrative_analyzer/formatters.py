@@ -3,7 +3,6 @@ import pandas as pd
 def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
     """
     Formats the summarized cluster output into a compact DataFrame where each row represents a cluster.
-
     Includes the cluster label, sentiment info, and total comment count for each cluster.
 
     Parameters:
@@ -26,7 +25,6 @@ def format_by_cluster(df, online_group_name="") -> pd.DataFrame:
 def format_by_text(df, online_group_name="") -> pd.DataFrame:
     """
     Flattens the summarized cluster output into a DataFrame where each row is an individual comment.
-
     Includes the comment text, its cluster label, and associated sentiment.
 
     Parameters:
@@ -36,8 +34,6 @@ def format_by_text(df, online_group_name="") -> pd.DataFrame:
     Returns:
         pd.DataFrame: Text-level DataFrame with one row per message.
     """
-
-    #This can eventually be remade using strictly dataframe manipulation, to be faster on larger datasets
     text_col = []
     sentiment_col = []
     online_group_name_col = []
@@ -69,7 +65,6 @@ def format_by_text(df, online_group_name="") -> pd.DataFrame:
 def format_to_dict(df, online_group_name="") -> dict:
     """
     Converts the summarized cluster output into a dictionary format useful for JSON export.
-
     Each cluster includes its label, sentiment, and comment count.
 
     Parameters:
