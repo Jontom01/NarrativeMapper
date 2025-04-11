@@ -291,7 +291,7 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 
 - **pca_kwargs:** Allows for input of PCA parameters.
 
-- **max_sample_size:** Max length of text list for each cluster being sampled.
+- **max_sample_size:** Max amount of texts in each cluster being used for summarization (limits OpenAI spending on gpt-4o-mini).
 
 **Default Parameter Values:**
 ```python
