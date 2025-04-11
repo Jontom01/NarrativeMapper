@@ -2,7 +2,6 @@ from sklearn.metrics.pairwise import pairwise_distances, cosine_distances
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import normalize
 from .utils import progress_bars
-from contextlib import nullcontext
 import umap.umap_ as umap
 import hdbscan
 import pandas as pd

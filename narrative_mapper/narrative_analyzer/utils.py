@@ -1,10 +1,11 @@
 from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, TimeRemainingColumn
+from contextlib import nullcontext
 import os
 import tiktoken
 
 def progress_bars(verbose, bars=True):
     '''
-    Used to create rich progress bars used within pipeline
+    Used to create 'rich' progress bars used within pipeline
     '''
     if not verbose:
         return nullcontext()

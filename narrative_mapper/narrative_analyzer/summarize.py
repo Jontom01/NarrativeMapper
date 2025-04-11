@@ -1,7 +1,7 @@
 from transformers import pipeline
-from openai import OpenAI, OpenAIError
+from openai import OpenAI
+from openai._exceptions import OpenAIError
 from .utils import get_openai_key, batch_list, progress_bars
-from contextlib import nullcontext
 import pandas as pd
 import torch
 
@@ -93,10 +93,7 @@ def extract_summary_for_cluster(texts: list[str]) -> str:
 
         return final_response.choices[0].message.content.strip()
 
-    except openai.error.RateLimitError:
-        raise RuntimeError("Rate limit exceeded. Please wait or lower request frequency.")
-
-    except openai.error.OpenAIError as e:
+    except OpenAIError as e:
         raise RuntimeError(f"OpenAI request failed") from e
 
     except Exception as e:

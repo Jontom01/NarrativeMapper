@@ -1,6 +1,6 @@
-from openai import OpenAI, OpenAIError
+from openai import OpenAI
+from openai._exceptions import OpenAIError
 from .utils import get_openai_key, batch_list, progress_bars
-from contextlib import nullcontext
 import pandas as pd
 import re
 
@@ -58,10 +58,7 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
         df['embeddings'] = embeddings_list
         return df
 
-    except openai.error.RateLimitError:
-        raise RuntimeError("Rate limit exceeded. Please wait or lower request frequency.")
-
-    except openai.error.OpenAIError as e:
+    except OpenAIError as e:
         raise RuntimeError(f"OpenAI request failed") from e
 
     except Exception as e:
