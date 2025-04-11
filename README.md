@@ -295,7 +295,7 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 
 </details>
 
-**Functions:**
+### Functions
 
 ```python
 
