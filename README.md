@@ -87,9 +87,9 @@ This will:
 
 - Automatically embed, cluster, and summarize the comments (with pretty progress bars if using --verbose)
 
-- Output a formatted results file in the current directory (output_summary.txt)
-
 - Print the summarized narratives and sentiment to the terminal
+
+- Output a formatted results file in the current directory (if using --flag-output)
 
 **Output example** from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_space.csv):
 

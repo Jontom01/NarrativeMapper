@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NarrativeMapper"
-version = "0.2.9"
+version = "0.3.0"
 description = "NarrativeMapper is a text analysis pipeline that uncovers the dominant narratives and emotional tones within online communities."
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [{ name = "jontom01", email = "jonnyy.thompson@gmail.com" }]
@@ -12,6 +12,7 @@ license = { text = "Apache-2.0" }
 requires-python = ">=3.8"
 dependencies = [
     "pandas",
+    "numpy",
     "openai",
     "umap-learn",
     "hdbscan",
@@ -20,8 +21,7 @@ dependencies = [
     "transformers",
     "tiktoken",
     "rich",
-    "torch",
-    "accelerate"
+    "torch"
 ]
 
 [tool.setuptools.packages.find]
