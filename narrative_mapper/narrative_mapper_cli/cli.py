@@ -29,6 +29,8 @@ def parse_args():
     parser.add_argument("--file-output", action="store_true", help="Output summaries to text file in working directory.")
     parser.add_argument("--max-samples", type=int, default=500, help="Max amount of texts samples from clusters being used in summarization. Default is 500.")
     parser.add_argument("--random-state", type=int, default=None, help="Sets value to UMAP and PCA random state. Default value is None.")
+    parser.add_argument("--no-pca", action="store_true", help="Allows user to skip PCA and go straight to UMAP.")
+    parser.add_argument("--dim-pca", type=int, default=100, help="Allows user to change PCA dim. Default is 100.")
     return parser.parse_args()
 
 
@@ -38,7 +40,7 @@ def load_data(file_path):
         raise ValueError("Input file must contain a 'text' column.")
     return df
 
-def get_cluster_params(df, verbose=False):
+def get_param_calcs(df, verbose=False):
     '''
     Autocalculates UMAP and HDBSCAN parameters based off of 'text' col size.
     '''
@@ -76,21 +78,36 @@ def get_cluster_params(df, verbose=False):
 
     return params
 
-def run_mapper(df, group_name, cluster_params, verbose, random_state=None, max_sample_size=500):
+def run_mapper(df, group_name, param_calcs, verbose, **mapper_args):
     '''
     Runs NarrativeMapper logic to obtain main narratives/topics and sentiments.
     '''
     mapper = NarrativeMapper(df, group_name, verbose)
     mapper.load_embeddings()
+
+    pca_kwargs = {
+        'n_components': mapper_args['dim_pca'], 
+        'random_state': mapper_args['random_state']
+        }
+    umap_kwargs = {
+        'n_components': param_calcs['n_components'],
+        'n_neighbors': param_calcs['n_neighbors'],
+        'random_state': mapper_args['random_state'],
+        "min_dist": 0.0, 
+        "low_memory": True
+        }
+    hdbscan_kwargs = {
+        'min_cluster_size': param_calcs['min_cluster_size'],
+        'min_samples': param_calcs['min_samples']
+    }
+    
     mapper.cluster(
-        n_components=cluster_params['n_components'],
-        n_neighbors=cluster_params['n_neighbors'],
-        min_cluster_size=cluster_params['min_cluster_size'],
-        min_samples=cluster_params['min_samples'],
-        random_state=random_state,
-        umap_kwargs={"min_dist": 0.0, "low_memory": True}
+        umap_kwargs=umap_kwargs,
+        hdbscan_kwargs=hdbscan_kwargs,
+        pca_kwargs=pca_kwargs,
+        use_pca= not mapper_args['no_pca'] #since no_pca == True means we dont want PCA
     )
-    mapper.summarize(max_sample_size=max_sample_size)
+    mapper.summarize(max_sample_size=mapper_args['max_sample_size'])
     return mapper
 
 def write_log(output, group_name, file_output):
@@ -118,7 +135,13 @@ def main():
     '''
     args = parse_args()
     df = load_data(args.file_name)
-    cluster_params = get_cluster_params(df, verbose=args.verbose)
-    mapper = run_mapper(df, args.online_group_name, cluster_params, args.verbose, random_state=args.random_state, max_sample_size=args.max_samples)
+    param_calcs = get_param_calcs(df, verbose=args.verbose)
+    mapper_args = {
+        'random_state': args.random_state,
+        'max_sample_size': args.max_samples,
+        'no_pca': args.no_pca,
+        'dim_pca': args.dim_pca
+        }
+    mapper = run_mapper(df, args.online_group_name, param_calcs, verbose=args.verbose, **mapper_args)
     output = mapper.format_to_dict()["clusters"]
     write_log(output, args.online_group_name, args.file_output)

@@ -79,60 +79,43 @@ from narrative_mapper import *
 Run NarrativeMapper directly from the terminal:
 
 ```bash
-narrativemapper path/to/your.csv online_group_name
+narrativemapper path/to/your.csv online_group_name --flag-options
 ```
 This will:
 
 - Load the CSV
 
-- Automatically embed, cluster, and summarize the comments
+- Automatically embed, cluster, and summarize the comments (with pretty progress bars if using --verbose)
 
 - Output a formatted results file in the current directory (output_summary.txt)
 
 - Print the summarized narratives and sentiment to the terminal
 
-File output example from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_politics_1200.csv):
+**Output example** from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_space.csv):
 
 ```txt
-Run Timestamp: 2025-04-09 01:46:44
-Online Group Name: reddit_politics_subreddit
+Run Timestamp: 2025-04-10 20:42:45
+Online Group Name: reddit_space_subreddit
 
-Summary: The cluster discusses the perceived corruption and overreach of the Supreme Court, the implications of political power dynamics under the Biden administration, and the urgent need for reforms in housing and justice systems, particularly in relation to Trump and the Republican Party's actions.
+Summary: The cluster addresses concerns regarding the reliability of SpaceX and Boeing in space missions, the implications of space debris on safety, and the need for corporate accountability in aerospace within the context of human exploration and technological advancement in space.
 Sentiment: NEGATIVE
-Comments: 200
+Text Samples: 244
 ---
-
-Summary: The cluster discusses the political landscape surrounding the 2024 presidential election, focusing on Kamala Harris's campaign against Donald Trump, their contrasting public personas, and the implications of age and mental acuity on their candidacies, while also highlighting voter registration trends and the need for Democratic mobilization.
-Sentiment: NEGATIVE
-Comments: 482
----
-
-Summary: The cluster discusses Donald Trump's legal troubles, including his felony convictions and accusations of serious crimes, alongside criticism of his behavior and the implications for his political future.
-Sentiment: NEGATIVE
-Comments: 92
----
-
-Summary: The cluster discusses the normalization of political violence among conservatives, the inadequacy of "thoughts and prayers" in addressing gun violence, and the hypocrisy of right-wing responses to mass shootings, particularly in relation to an assassination attempt on Donald Trump.
-Sentiment: NEGATIVE
-Comments: 86
+Summary: The cluster focuses on personal experiences and emotions tied to witnessing solar eclipses, encompassing travel efforts, photography techniques, and the profound awe these celestial events evoke.
+Sentiment: NEUTRAL
+Text Samples: 139
 ---
 ```
 **Flag Options:**
-<details>
-<summary><strong>Click to view</strong></summary>
 
 ```bash
-narrativemapper path/to/your.csv online_group_name --verbose --file-output --max-samples int --random-state int
+  --verbose             Print/show detailed parameter scaling info and progress bars.
+  --file-output         Output summaries to text file in working directory.
+  --max-samples         Max amount of texts samples from clusters being used in summarization. Default is 500.
+  --random-state        Sets value to UMAP and PCA random state. Default value is None.
+  --no-pca              Skip PCA and go straight to UMAP.
+  --dim-pca             Change PCA dim. Default is 100.
 ```
-
-- **verbose:** - Print/show detailed parameter scaling info and progress bars.
-
-- **file-output:** - Output summaries to text file in working directory.
-
-- **max-samples:** - Max amount of texts samples from clusters being used in summarization. Default is 500.
-
-- **random-state:** - Sets value to UMAP and PCA random state. Default value is None. Try different numbers if you want varying results on the same dataset.
-</details>
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
 
@@ -148,14 +131,14 @@ import pandas as pd
 file_df = pd.read_csv("file-path")
 
 #initialize NarrativeMapper object
-mapper = NarrativeMapper(file_df, "r/antiwork")
+mapper = NarrativeMapper(file_df, "r/antiwork", verbose=True)
 
 #embeds semantic vectors
 mapper.load_embeddings()
 
-#clustering: main UMAP and HDBSCAN variables along with kwargs for more customizability.
-umap_kwargs =  {'min_dist': 0.0}
-mapper.cluster(n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15, random_state=None, umap_kwargs=umap_kwargs)
+#clustering: has default UMAP and HDBSCAN parameters set but has kwargs for more customizability.
+umap_kwargs =  {'n_components': 10, 'min_dist': 0.0}
+mapper.cluster(umap_kwargs=**umap_kwargs, use_pca=False)
 
 #summarize each cluster's topic and sentiment
 mapper.summarize(max_sample_size=500)
@@ -183,8 +166,8 @@ df = pd.read_csv("file-path")
 
 #manual control over each step:
 embeddings = get_embeddings(file_df)
-cluster_df = cluster_embeddings(embeddings, n_components=20, n_neighbors=20, min_cluster_size=40, min_samples=15)
-summary_df = summarize_clusters(cluster_df, max_sample_size=500)
+cluster_df = cluster_embeddings(embeddings)
+summary_df = summarize_clusters(cluster_df)
 
 #export/format options
 summary_dict = format_to_dict(summary_df, online_group_name="r/antiwork")
@@ -194,7 +177,7 @@ cluster_df = format_by_cluster(summary_df, online_group_name="r/antiwork")
 
 ## Output Formats
 
-This example is based off of 1800 r/antiwork comments from the top 300 posts within the last year (Date of Writing: 2025-04-03).
+This example is based off of [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_antiwork_1800.csv)
 
 The three formatter functions return the following:
 
@@ -203,61 +186,50 @@ The three formatter functions return the following:
 <details>
 <summary><strong>format_to_dict output example</strong></summary>
 
-```json
+```python
+
 {
-    "online_group_name": "r/antiwork",
-    "clusters": [
+    'online_group_name': 'r/antiwork',
+    'clusters': [
         {
-            "cluster": 0,
-            "cluster_summary": "The core theme of this cluster revolves around the frustrations and challenges of the modern job application and interview process, highlighting issues such as discrimination, exploitative practices, and the disconnect between employers and candidates.",
-            "sentiment": "NEGATIVE",
-            "text_count": 76
+            'cluster': 2,
+            'cluster_summary': 'The cluster focuses on the exploitation of workers under capitalism, highlighting the growing wealth disparity driven by corporate greed, the manipulation of housing markets, and the urgent need for systemic reforms to improve living conditions, wages, and labor rights.',
+            'sentiment': 'NEGATIVE',
+            'text_count': 483
         },
         {
-            "cluster": 1,
-            "cluster_summary": "The core theme of this cluster revolves around the debate over low wages in the fast food industry, the impact of wage increases on business practices and pricing, and the broader implications for workers' livelihoods and economic conditions.",
-            "sentiment": "NEGATIVE",
-            "text_count": 100
+            'cluster': 4,
+            'cluster_summary': 'The conversation cluster centers on critiques of remote work policies, reflections on privilege and inequality, and humorous observations about daily frustrations and absurdities.',
+            'sentiment': 'NEGATIVE',
+            'text_count': 80
         },
         {
-            "cluster": 2,
-            "cluster_summary": "The cluster reflects widespread frustration and despair among younger generations regarding economic instability, unaffordable living costs, inadequate healthcare, and the perceived indifference of older generations towards their struggles.",
-            "sentiment": "NEGATIVE",
-            "text_count": 112
+            'cluster': 5,
+            'cluster_summary': 'This cluster highlights the frustrations and absurdities of modern job application processes, focusing on discriminatory hiring practices, excessive interview demands, and the dehumanizing effects of AI and psychometric testing on candidates.',
+            'sentiment': 'NEGATIVE',
+            'text_count': 76
         },
         {
-            "cluster": 3,
-            "cluster_summary": "The core theme of this cluster revolves around employee dissatisfaction with management practices, workplace exploitation, and the importance of asserting one's rights and boundaries in a toxic work environment.",
-            "sentiment": "NEGATIVE",
-            "text_count": 464
+            'cluster': 7,
+            'cluster_summary': 'The conversation focuses on the low wages and poor treatment of fast food workers, emphasizing the urgent need for improved compensation and benefits in relation to living costs.',
+            'sentiment': 'NEGATIVE',
+            'text_count': 58
         },
         {
-            "cluster": 4,
-            "cluster_summary": "The core theme of this cluster revolves around dissatisfaction with traditional work structures, advocating for reduced work hours, better work-life balance, and criticism of corporate exploitation and the lack of employee rights.",
-            "sentiment": "NEGATIVE",
-            "text_count": 95
-        },
-        {
-            "cluster": 5,
-            "cluster_summary": "The core theme of this cluster revolves around wealth inequality, criticizing the hoarding of wealth by billionaires and the systemic issues that perpetuate economic disparity and exploitation of the working class.",
-            "sentiment": "NEGATIVE",
-            "text_count": 95
-        },
-        {
-            "cluster": 6,
-            "cluster_summary": "The comments express strong criticism of capitalism, highlighting themes of exploitation, corporate greed, and the detrimental impact of billionaires and CEOs on workers and society.",
-            "sentiment": "NEGATIVE",
-            "text_count": 89
+            'cluster': 8,
+            'cluster_summary': 'The conversation cluster highlights pervasive issues of employee dissatisfaction stemming from wage theft, workplace exploitation, toxic environments, harassment, and inadequate labor rights, alongside the struggle for work-life balance and the necessity for legal recourse in employment disputes.',
+            'sentiment': 'NEGATIVE',
+            'text_count': 392
         }
     ]
-} 
+}
 ```
 </details>
 
 **format_by_cluster()** returns pandas DataFrame with columns:
 
 <details>
-<summary><strong>format_by_cluster columns</strong></summary>
+<summary><strong>Click to view</strong></summary>
 
 - **online_group_name:** online group name
 
@@ -280,7 +252,7 @@ The three formatter functions return the following:
 **format_by_text()** returns pandas DataFrame with columns:
 
 <details>
-<summary><strong>format_by_text columns</strong></summary>
+<summary><strong>Click to view</strong></summary>
 
 - **online_group_name**: online group name
 
@@ -309,21 +281,20 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 ```python
 
 #Converts each message into a 1536-dimensional vector using OpenAI's text-embedding-3-small.
-get_embeddings(file_df)
+get_embeddings(file_df, verbose=...)
 
 #Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
 cluster_embeddings(
     embeddings, 
-    n_components=..., 
-    n_neighbors=..., 
-    min_cluster_size=..., 
-    min_samples=..., 
+    verbose=..., 
+    use_pca=...,
+    pca_kwargs=..., 
     umap_kwargs=..., 
     hdbscan_kwags=...
     )
 
 #Uses GPT (via Chat Completions) for cluster summaries and Hugging Face for sentiment analysis.
-summarize_clusters(clustered_df, max_sample_size=...)
+summarize_clusters(clustered_df, max_sample_size=..., verbose=...)
 
 #Returns structured output as a dictionary (ideal for JSON export).
 format_to_dict(summary_df)
@@ -355,11 +326,8 @@ class NarrativeMapper:
 ```python
 load_embeddings()
 cluster(
-    n_components=..., 
-    n_neighbors=..., 
-    min_cluster_size=..., 
-    min_samples=...,
-    random_state=..., 
+    use_pca=...,
+    pca_kwargs=..., 
     umap_kwargs=..., 
     hdbscan_kwargs=...
     )
@@ -374,21 +342,15 @@ format_to_dict()
 <details>
 <summary><strong>Click to expand</strong></summary>
 
-- **n_components:** The number of dimensions UMAP reduces the embedding vectors to. Lower values simplify the data for clustering.
+- **verbose:** Print/show detailed parameter scaling info and progress bars.
 
-- **n_neighbors:** Influences UMAP’s balance between local and global structure. Higher values emphasize global relationships.
+- **use_pca:** Toggle whether or not you want to use PCA before UMAP (default is True since it helps reduce RAM usage from UMAP).
 
-- **min_cluster_size:** In HDBSCAN, the minimum number of points required to form a cluster. Smaller values allow more granular clusters.
+- **umap_kwargs:** Allows for input of UMAP parameters.
 
-- **min_samples:** A density sensitivity parameter in HDBSCAN. Higher values make clustering more conservative.
+- **hdbscan_kwags:** Allows for input of HDBSCAN parameters.
 
-- **random_state:** Determines the randomness seed for both PCA and UMAP.
-
-- **umap_kwargs:** Allows for input of other UMAP parameters.
-
-- **hdbscan_kwags:** Allows for input of other HDBSCAN parameters.
-
-- **max_sample_size:** Maximum number of comments sampled per cluster for summarization.
+- **pca_kwargs:** Allows for input of PCA parameters.
 
 </details>
 
@@ -406,6 +368,6 @@ The OpenAI text-embedding-3-small model costs approximately $0.02 per 1 million 
 
 The Chat Completions model used for summarization (gpt-4o-mini) is $0.15 per 1 million input tokens. The max_sample_size parameter (referenced later) helps reduce costs by limiting how many comments are passed into gpt-4o-mini for each cluster. This can significantly reduce the Chat Completions token usage.
 
-The gpt-4o-mini input prompt (excluding the text) and output summary are both very short (<100 tokens), so their cost contribution is negligible.
+The gpt-4o-mini input prompt (excluding the text) and output summary (for both stages) are very short (<1000 tokens), so their cost contribution is negligible.
 
 </details>

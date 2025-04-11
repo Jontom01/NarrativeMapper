@@ -63,14 +63,11 @@ def merge_clusters_union_find(df, threshold=0.2, embedding_col='embeddings', clu
 
 def cluster_embeddings(
     df, 
-    n_components=20, 
-    n_neighbors=20, 
-    min_cluster_size=40, 
-    min_samples=15,
     verbose=False,
-    random_state=None,
-    umap_kwargs=None,
-    hdbscan_kwargs=None
+    umap_kwargs={'n_components': 10, 'n_neighbors': 20, 'min_dist': 0.0},
+    hdbscan_kwargs={'min_cluster_size': 30, 'min_samples': 10},
+    pca_kwargs={'n_components': 100},
+    use_pca=True
     ) -> pd.DataFrame:
     """
     Preprocesses using L2 normalization and PCA to 100 dim.
@@ -83,13 +80,10 @@ def cluster_embeddings(
 
     Parameters:
         df (DataFrame): DataFrame with embeddings column.
-        n_components (int): Target number of dimensions for UMAP reduction.
-        n_neighbors (int): Number of neighbors for UMAP.
-        min_cluster_size (int): Minimum cluster size for HDBSCAN.
-        min_samples (int): Minimum samples for HDBSCAN.
-        random_state (int): Determines the randomness seed for both PCA and UMAP.
         umap_kwargs (dict): Allows for more UMAP input parameters
         hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
+        pca_kwargs (dict): Allows for more PCA input parameters
+        use_pca (bool): Allows user to not use PCA and go straight to UMAP
 
     Returns:
         pd.DataFrame: DataFrame of clustered items with a 'cluster' column.
@@ -98,8 +92,9 @@ def cluster_embeddings(
     embeddings = normalize(embeddings, norm='l2') #since both UMAP + HDBSCAN are setup for euclidean
 
     #PCA so UMAP doesn't assassinate my memory
-    pca = PCA(n_components=100, random_state=random_state)
-    reduced_embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
+    if use_pca:
+        pca = PCA(**pca_kwargs)
+        embeddings = pca.fit_transform(embeddings) #returns float32 when float32 is input
 
     #UMAP dimensionality:
     progress_context_umap = (
@@ -113,18 +108,12 @@ def cluster_embeddings(
         if verbose:
             task = progress.add_task("[cyan]UMAP reducing dimensions...", total=1)
 
-        if umap_kwargs == None:
-            umap_kwargs = {}
-
         warnings.filterwarnings("ignore", message=".*n_jobs value 1 overridden.*")
         umap_reducer = umap.UMAP(
-            n_neighbors=n_neighbors,
-            n_components=n_components,
             metric='euclidean',
-            random_state=random_state,
             **umap_kwargs       
         )
-        reduced_embeddings = umap_reducer.fit_transform(reduced_embeddings)
+        embeddings = umap_reducer.fit_transform(embeddings)
 
         if verbose:
             progress.update(task, advance=1)
@@ -141,16 +130,11 @@ def cluster_embeddings(
         if verbose:
             task = progress.add_task("[cyan]HDBSCAN clustering...", total=1)
 
-        if hdbscan_kwargs == None:
-            hdbscan_kwargs = {}
-
         clusterer = hdbscan.HDBSCAN(
-            min_cluster_size=min_cluster_size,
-            min_samples=min_samples,
             metric='euclidean',
             **hdbscan_kwargs
         )
-        cluster_labels = clusterer.fit_predict(reduced_embeddings)
+        cluster_labels = clusterer.fit_predict(embeddings)
 
         if verbose:
             progress.update(task, advance=1)

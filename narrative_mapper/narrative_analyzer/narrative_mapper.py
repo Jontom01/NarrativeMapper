@@ -42,41 +42,33 @@ class NarrativeMapper:
         return self
 
     def cluster(
-        self, 
-        n_components: int=20, 
-        n_neighbors: int=20,
-        min_cluster_size: int=40, 
-        min_samples: int=15,
-        random_state=None,
-        umap_kwargs=None,
-        hdbscan_kwargs=None
+        self,
+        umap_kwargs={'n_components': 10, 'n_neighbors': 20},
+        hdbscan_kwargs={'min_cluster_size': 30, 'min_samples': 10},
+        pca_kwargs={'n_components': 100},
+        use_pca=True
         ) -> "NarrativeMapper":
         """
         Applies UMAP for dimensionality reduction and HDBSCAN for clustering
         on the loaded embeddings.
         
         Parameters:
-            n_components (int): Target dimensions for UMAP.
-            n_neighbors (int): Number of neighbors for UMAP.
-            min_cluster_size (int): Minimum cluster size for HDBSCAN.
-            min_samples (int): Minimum samples for HDBSCAN.
+            df (DataFrame): DataFrame with embeddings column.
             umap_kwargs (dict): Allows for more UMAP input parameters
             hdbscan_kwargs (dict): Allows for more HDBSCAN input parameters
-            random_state (int): Determines the randomness seed for both PCA and UMAP.
+            pca_kwargs (dict): Allows for more PCA input parameters
+            use_pca (bool): Allows user to not use PCA and go straight to UMAP
         
         Returns:
             NarrativeMapper: Self, with clustering results stored.
         """
         self.cluster_df = cluster_embeddings(
             self.embeddings_df,
-            n_components=n_components,
-            n_neighbors=n_neighbors,
-            min_cluster_size=min_cluster_size,
-            min_samples=min_samples,
             verbose=self.verbose,
-            random_state=random_state,
             umap_kwargs=umap_kwargs,
-            hdbscan_kwargs=hdbscan_kwargs
+            hdbscan_kwargs=hdbscan_kwargs,
+            pca_kwargs=pca_kwargs,
+            use_pca=use_pca
         )
         return self
 
