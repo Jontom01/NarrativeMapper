@@ -38,7 +38,7 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 **Installation:**
 
 <details>
-<summary><strong>Click to view installation process</strong></summary>
+<summary>Click to view installation process</summary>
 
 Install via [PyPI](https://pypi.org/project/NarrativeMapper/): 
 
@@ -50,7 +50,7 @@ pip install NarrativeMapper
 **Setup:**
 
 <details>
-<summary><strong>Click to view setup process</strong></summary>
+<summary>Click to view setup process</summary>
 
 1. Create a .env file in your root directory (same folder where your script runs).
 
@@ -184,7 +184,7 @@ The three formatter functions return the following:
 **format_to_dict()** returns dict with following format:
 
 <details>
-<summary><strong>format_to_dict output example</strong></summary>
+<summary>Click to view</summary>
 
 ```python
 
@@ -229,7 +229,7 @@ The three formatter functions return the following:
 **format_by_cluster()** returns pandas DataFrame with columns:
 
 <details>
-<summary><strong>Click to view</strong></summary>
+<summary>Click to view</summary>
 
 - **online_group_name:** online group name
 
@@ -252,7 +252,7 @@ The three formatter functions return the following:
 **format_by_text()** returns pandas DataFrame with columns:
 
 <details>
-<summary><strong>Click to view</strong></summary>
+<summary>Click to view</summary>
 
 - **online_group_name**: online group name
 
@@ -340,7 +340,7 @@ format_to_dict()
 ### Parameter Reference
 
 <details>
-<summary><strong>Click to expand</strong></summary>
+<summary>Click to expand</summary>
 
 - **verbose:** Print/show detailed parameter scaling info and progress bars.
 
@@ -362,7 +362,7 @@ Estimated cost: **$0.02 to $0.17 per 1 million tokens**.
 Example: A CSV containing 1,000, all greater than one sentence long, Reddit comments costs approximately **$0.01** to process.
 
 <details>
-<summary><strong>Click for pricing details</strong></summary>
+<summary>Click for pricing details</summary>
 
 The OpenAI text-embedding-3-small model costs approximately $0.02 per 1 million input tokens. Determined by the total tokens of your input textual messages.
 
