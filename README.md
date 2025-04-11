@@ -22,7 +22,7 @@ Ever wonder what stories are dominating Reddit, Twitter, or any corner of the in
 
 - Uses OpenAI Embeddings: [OpenAI's text-embedding-3-small](https://platform.openai.com/docs/guides/embeddings)
 
-- Preprocessing: L2 Normalization (for Euclidean distance) + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)(to reduce UMAP memory usage) 
+- Preprocessing: L2 Normalization (for Euclidean distance setup) + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (to reduce UMAP memory usage) 
 
 - Dimensionality reduction: [UMAP](https://umap-learn.readthedocs.io/en/latest/)
 
@@ -108,7 +108,7 @@ Text Samples: 139
 ```
 **Flag Options:**
 
-```bash
+```txt
   --verbose             Print/show detailed parameter scaling info and progress bars.
   --file-output         Output summaries to text file in working directory.
   --max-samples         Max amount of texts samples from clusters being used in summarization. Default is 500.
@@ -293,7 +293,7 @@ cluster_embeddings(
     hdbscan_kwags=...
     )
 
-#Uses GPT (via Chat Completions) for cluster summaries and Hugging Face for sentiment analysis.
+#Uses GPT (via Chat Completions) for cluster summaries and Hugging Face's distilbert for sentiment analysis.
 summarize_clusters(clustered_df, max_sample_size=..., verbose=...)
 
 #Returns structured output as a dictionary (ideal for JSON export).
