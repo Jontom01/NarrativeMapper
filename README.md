@@ -293,6 +293,17 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 
 - **max_sample_size:** Max length of text list for each cluster being sampled.
 
+**Default Parameter Values:**
+```python
+verbose=False
+umap_kwargs={'n_components': 10, 'n_neighbors': 20, 'min_dist': 0.0},
+hdbscan_kwargs={'min_cluster_size': 30, 'min_samples': 10},
+pca_kwargs={'n_components': 100},
+use_pca=True
+max_sample_size=500
+```
+
+
 </details>
 
 ### Functions
@@ -302,7 +313,10 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 #Converts each message into a 1536-dimensional vector using OpenAI's text-embedding-3-small.
 get_embeddings(file_df, verbose=bool)
 
-#Clusters the embeddings using UMAP (for reduction) and HDBSCAN (for density-based clustering).
+#Clusters the embeddings using PCA and L2 normalization (for preprocessing), UMAP (for reduction), 
+#and HDBSCAN (for clustering). 
+#Both UMAP and HDBSCAN are set to euclidean distance, all other parameters can be changed with kwargs.
+#Uses Union-find algorithm to merge clusters that are too similar.
 cluster_embeddings(
     embeddings, 
     verbose=bool, 
@@ -312,7 +326,10 @@ cluster_embeddings(
     hdbscan_kwags=dict
     )
 
-#Uses GPT (via Chat Completions) for cluster summaries and Hugging Face's distilbert for sentiment analysis.
+#Uses OpenAI Chat Completions gpt-4o-mini (in 2 stages) for cluster summaries and Hugging Face's 
+#distilbert-base-uncased-finetuned-sst-2-english for sentiment analysis.
+#If there are 2 times more negative texts than positive, that cluster is determined to be
+#'NEGATIVE', and vice versa for 'POSITIVE' clusters. Otherwise they are determined 'NEUTRAL'.
 summarize_clusters(clustered_df, max_sample_size=int, verbose=bool)
 
 #Returns structured output as a dictionary (ideal for JSON export).
@@ -355,7 +372,25 @@ format_by_text()
 format_by_cluster()
 format_to_dict()
 ```
+### Auto-Scaling Clustering Parameters (Used by CLI)
+```python
+#num_texts is the size of the dataset
+base_num_texts = 500
+N = max(1, num_texts / base_num_texts)
 
+#n_components ~ constant to N. 
+n_components = 10
+
+#n_neighbors ~ cube root of N. range [20, 75]
+n_neighbors = int(min(75, max(20, 20*(N**(1/3)))))
+
+#min_cluster_size ~ sqrt(N). range [30, 200]
+min_cluster_size = int(min(200, max(30, 30*sqrt(N))))
+
+#min_samples ~ log2(N). range [5, 30]
+min_samples = int(min(30, max(5, 5*log2(N))))
+```
+I also set min_dist=0.0 and low_memory=True for UMAP.
 
 ## Estimated Cost (OpenAI Pricing)
 
