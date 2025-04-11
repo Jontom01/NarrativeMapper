@@ -1,6 +1,28 @@
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, TimeRemainingColumn
 import os
 import tiktoken
 
+def progress_bars(verbose, bars=True):
+    '''
+    Used to create rich progress bars used within pipeline
+    '''
+    if not verbose:
+        return nullcontext()
+    if bars:
+        return Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]{task.description}"),
+            BarColumn(),
+            TimeElapsedColumn()
+        )
+    else:
+        return Progress(
+            SpinnerColumn(),
+            TextColumn("[bold cyan]{task.description}"),
+            TimeElapsedColumn()
+        )
+
+    
 def get_openai_key():
     key = os.getenv("OPENAI_API_KEY")
     if not key:

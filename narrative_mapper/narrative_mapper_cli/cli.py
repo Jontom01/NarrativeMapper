@@ -17,9 +17,7 @@ import logging
 import argparse
 import csv
 import pandas as pd
-import sys
 
-#better cluster param calculations, flag options (sample size limiter, batch_size, output file directory)
 def parse_args():
     #INPUT ARGUMENTS
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
@@ -29,7 +27,7 @@ def parse_args():
     parser.add_argument("--verbose", action="store_true", help="Print/show detailed parameter scaling info and progress bars.")
     parser.add_argument("--file-output", action="store_true", help="Output summaries to text file in working directory.")
     parser.add_argument("--max-samples", type=int, default=500, help="Max amount of texts samples from clusters being used in summarization. Default is 500.")
-    parser.add_argument("--random-state", type=int, default=None, help="Sets value to UMAP and PCA random state. Default value is None.")
+    parser.add_argument("--random-state", type=int, default=42, help="Changes value to UMAP and PCA random state. Default value is 42.")
     parser.add_argument("--no-pca", action="store_true", help="Allows user to skip PCA and go straight to UMAP.")
     parser.add_argument("--dim-pca", type=int, default=100, help="Allows user to change PCA dim. Default is 100.")
     return parser.parse_args()
@@ -41,7 +39,7 @@ def load_data(file_path):
         if 'text' not in df.columns:
             raise ValueError("Input file must contain a 'text' column.")
         return df
-        
+
     except Exception as e:
         raise RuntimeError(f"Failed to read CSV file: {e}")
 
@@ -157,5 +155,4 @@ def main():
         write_log(output, args.online_group_name, args.file_output)
 
     except Exception as e:
-        print(f"Error running CLI: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Error running CLI") from e

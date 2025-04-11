@@ -1,11 +1,9 @@
 from transformers import pipeline
 from openai import OpenAI, OpenAIError
-from .utils import get_openai_key, batch_list
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
+from .utils import get_openai_key, batch_list, progress_bars
 from contextlib import nullcontext
 import pandas as pd
 import torch
-import sys
 
 device = 0 if torch.cuda.is_available() else -1
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", device=device)
@@ -41,8 +39,7 @@ def analyze_sentiments_for_texts(texts) -> (str, list[dict]):
         return overall, sentiments
 
     except Exception as e:
-        print(f"Unexpected error during cluster sentiment analysis: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Unexpected error during cluster sentiment analysis") from e
 
 def extract_summary_for_cluster(texts: list[str]) -> str:
     """
@@ -96,13 +93,14 @@ def extract_summary_for_cluster(texts: list[str]) -> str:
 
         return final_response.choices[0].message.content.strip()
 
-    except OpenAIError as e:
-        print(f"OpenAI API error: {e}")
-        sys.exit(1)
+    except openai.error.RateLimitError:
+        raise RuntimeError("Rate limit exceeded. Please wait or lower request frequency.")
+
+    except openai.error.OpenAIError as e:
+        raise RuntimeError(f"OpenAI request failed") from e
 
     except Exception as e:
-        print(f"Unexpected error during cluster summarization: {e}")
-        sys.exit(1)
+        raise RuntimeError(f"Unexpected error during cluster summarization") from e
 
 
 def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False) -> pd.DataFrame:
@@ -128,7 +126,8 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
             - 'all_sentiments': List of individual sentiment results per text
     """
     df = df.copy()
-    df = df.drop(columns=['embeddings'])
+    df = df.drop(columns=['embeddings']) #drop embeddings to reduce memory; not needed for summarization
+
     #group texts by cluster and sample up to max_sample texts per cluster
     grouped_texts = {}
     grouped = df.groupby('cluster')
@@ -142,14 +141,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
     #use OpenAI Chat Completions to extract a concise summary (cluster label) for each cluster
     cluster_summary = []
     
-    progress_context_summary = (
-    Progress(
-        SpinnerColumn(),
-        TextColumn("[bold cyan]{task.description}"),
-        BarColumn(),
-        TimeElapsedColumn()
-        ) if verbose else nullcontext()
-    )
+    progress_context_summary = progress_bars(verbose, bars=True)
     with progress_context_summary as progress:
         if verbose:
             task = progress.add_task("[cyan]Extracting summaries...", total=len(grouped_df['text']))
@@ -157,6 +149,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
         for texts in grouped_df['text']:
             summary = extract_summary_for_cluster(texts)
             cluster_summary.append(summary)
+
             if verbose:
                 progress.update(task, advance=1)
 
@@ -166,14 +159,7 @@ def summarize_clusters(df: pd.DataFrame, max_sample_size: int=500, verbose=False
     aggregated_sentiments = []
     all_sentiments = []
 
-    progress_context_sentiment = (
-    Progress(
-        SpinnerColumn(),
-        TextColumn("[bold cyan]{task.description}"),
-        BarColumn(),
-        TimeElapsedColumn()
-        ) if verbose else nullcontext()
-    )
+    progress_context_sentiment = progress_bars(verbose, bars=True)
     with progress_context_sentiment as progress:
         if verbose:
             task = progress.add_task("[cyan]Extracting sentiments...", total=len(grouped_df['text']))
