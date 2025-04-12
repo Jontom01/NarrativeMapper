@@ -7,15 +7,17 @@ Whether you're coding in Python or simply running a single command in your termi
 
 Ever wonder what stories are dominating Reddit, Twitter, or any corner of the internet? NarrativeMapper clusters similar online discussions and uses OpenAI’s GPT to summarize the dominant narratives, tone, and sentiment. Built for researchers, journalists, analysts, and anyone trying to make sense of the chaos.
 
-- Extracts dominant narratives from messy text data
+Extracts dominant narratives from messy text data:
 
-- Clusters similar posts using embeddings + UMAP + HDBSCAN
+- Embeds messages
 
-- Summarizes each cluster with GPT
+- Clusters embeddings
 
-- Analyzes sentiment per narrative
+- Summarizes clusters with GPT
 
-- Plug-and-play pipeline: **CLI**, class-based, or functional
+- Analyzes sentiments of clusters
+
+Packages it all together in clean functional, class-based, and command line interfaces.
 
 <details>
 <summary><strong>Click to view actual models and algorithms</strong></summary>

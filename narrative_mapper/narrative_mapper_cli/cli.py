@@ -78,10 +78,10 @@ def get_param_calcs(df, verbose=False):
     if verbose:
         print(f"[PARAM SCALING]")
         print(f"Text count: {num_texts}")
-        print(f"n_components: {params['n_components']}")
-        print(f"n_neighbors: {params['n_neighbors']}")
-        print(f"min_cluster_size: {params['min_cluster_size']}")
-        print(f"min_samples: {params['min_samples']}")
+        print(f"UMAP n_components: {params['n_components']}")
+        print(f"UMAP n_neighbors: {params['n_neighbors']}")
+        print(f"HDBSCAN min_cluster_size: {params['min_cluster_size']}")
+        print(f"HDBSCAN min_samples: {params['min_samples']}")
 
     return params
 
