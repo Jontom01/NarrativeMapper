@@ -199,14 +199,6 @@ def cluster_embeddings(
     df['cluster'] = cluster_labels.tolist()
     df = df[df['cluster'] != -1] #drop noise cluster
 
-    if verbose:
-        num_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
-        print(f"HDBSCAN found {num_clusters} clusters.")
-
     merged_df = merge_clusters_union_find(df, threshold=0.3)  #similarity cutoff 
-
-    if verbose:
-        num_clusters = len(set(merged_df))
-        print(f"{num_clusters} clusters after merging.")
     
     return merged_df
