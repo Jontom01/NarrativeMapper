@@ -6,7 +6,7 @@ import pandas as pd
 
 class NarrativeMapper:
     """
-    A pipeline for processing, clustering, summarizing, and formatting text data.
+    Class-based interface of the pipeline.
 
     Methods allow you to load embeddings from a file, perform clustering,
     generate cluster summaries, and format the results into various output structures.
@@ -35,9 +35,6 @@ class NarrativeMapper:
         """
         Loads and processes text data to obtain OpenAI embeddings.
         
-        Parameters:
-            batch_size (int): length of text-list chunks being send to OpenAI embeddings
-        
         Returns:
             NarrativeMapper: Self, with embeddings loaded.
         """
@@ -46,9 +43,9 @@ class NarrativeMapper:
 
     def cluster(
         self,
-        umap_kwargs={'n_components': 10, 'n_neighbors': 20},
-        hdbscan_kwargs={'min_cluster_size': 30, 'min_samples': 10},
-        pca_kwargs={'n_components': 100},
+        umap_kwargs=None,
+        hdbscan_kwargs=None,
+        pca_kwargs=None,
         use_pca=True
         ) -> "NarrativeMapper":
         """

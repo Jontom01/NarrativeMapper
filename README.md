@@ -24,7 +24,7 @@ Packages it all together in clean functional, class-based, and command line inte
 
 - Uses OpenAI Embeddings: [OpenAI's text-embedding-3-small](https://platform.openai.com/docs/guides/embeddings)
 
-- Preprocessing: L2 Normalization (for Euclidean distance setup) + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (to reduce UMAP memory usage) 
+- Preprocessing: L2 Normalization + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (these are only used if metric is euclidean, which is the default) 
 
 - Dimensionality reduction: [UMAP](https://umap-learn.readthedocs.io/en/latest/)
 
@@ -138,8 +138,8 @@ mapper = NarrativeMapper(file_df, "online_group_name", verbose=True)
 #embeds semantic vectors
 mapper.load_embeddings()
 
-#clustering with default parameters.
-mapper.cluster() #Refer to Parameter Reference for optional kwargs
+#clustering params are autocalculated based on dataset size (by default).
+mapper.cluster() #Refer to Parameter Reference for optional kwargs if you want custom params
 
 #summarizing with default parameters.
 mapper.summarize() #Has max_sample_size param (refer to Parameter Reference)
@@ -287,11 +287,11 @@ CSV Text Data → Embeddings → Clustering → Summarization → Formatting
 
 - **use_pca:** Toggle whether or not you want to use PCA before UMAP (default is True since it helps reduce RAM usage from UMAP).
 
-- **umap_kwargs:** Allows for input of UMAP parameters.
+- **umap_kwargs:** Allows for customized input of all UMAP parameters.
 
-- **hdbscan_kwags:** Allows for input of HDBSCAN parameters.
+- **hdbscan_kwags:** Allows for customized input of all HDBSCAN parameters.
 
-- **pca_kwargs:** Allows for input of PCA parameters.
+- **pca_kwargs:** Allows for customized input of all PCA parameters.
 
 - **max_sample_size:** Max amount of texts in each cluster being used for summarization (limits OpenAI spending on gpt-4o-mini).
 
@@ -315,8 +315,8 @@ max_sample_size=500
 #Converts each message into a 1536-dimensional vector using OpenAI's text-embedding-3-small.
 get_embeddings(file_df, verbose=bool)
 
-#Clusters the embeddings using PCA and L2 normalization (for preprocessing), UMAP (for reduction), 
-#and HDBSCAN (for clustering). 
+#Clusters the embeddings using PCA and L2 normalization (for preprocessing if metric is euclidean), 
+#UMAP (for reduction), and HDBSCAN (for clustering). 
 #Both UMAP and HDBSCAN are set to euclidean distance, all other parameters can be changed with kwargs.
 #Uses Union-find algorithm to merge clusters that are too similar.
 cluster_embeddings(
@@ -374,7 +374,7 @@ format_by_text()
 format_by_cluster()
 format_to_dict()
 ```
-### Auto-Scaling Clustering Parameters (Used by CLI)
+### Auto-Scaling Clustering Parameters (Used by CLI and default Class-based + Function-based params)
 ```python
 #num_texts is the size of the dataset
 base_num_texts = 500
@@ -383,11 +383,11 @@ N = max(1, num_texts / base_num_texts)
 #n_components ~ constant to N. 
 n_components = 10
 
-#n_neighbors ~ cube root of N. range [20, 75]
-n_neighbors = int(min(75, max(20, 20*(N**(1/3)))))
+#n_neighbors ~ cube root of N. range [15, 75]
+n_neighbors = int(min(75, max(15, 15*(N**(1/3)))))
 
-#min_cluster_size ~ sqrt(N). range [30, 200]
-min_cluster_size = int(min(200, max(30, 30*sqrt(N))))
+#min_cluster_size ~ sqrt(N). range [20, 200]
+min_cluster_size = int(min(200, max(20, 20*sqrt(N))))
 
 #min_samples ~ log2(N). range [5, 30]
 min_samples = int(min(30, max(5, 5*log2(N))))

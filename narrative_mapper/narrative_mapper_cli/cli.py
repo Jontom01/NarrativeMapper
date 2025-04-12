@@ -12,7 +12,6 @@ if not openai_key:
 
 from narrative_mapper.narrative_analyzer.narrative_mapper import NarrativeMapper
 from datetime import datetime
-from math import sqrt, log2
 import logging
 import argparse
 import csv
@@ -23,6 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
     parser.add_argument("file_name", type=str, help="file path")
     parser.add_argument("online_group_name", type=str, help="online group name")
+    
     #FLAGS
     parser.add_argument("--verbose", action="store_true", help="Print/show detailed parameter scaling info and progress bars.")
     parser.add_argument("--file-output", action="store_true", help="Output summaries to text file in working directory.")
@@ -30,8 +30,8 @@ def parse_args():
     parser.add_argument("--random-state", type=int, default=42, help="Changes value to UMAP and PCA random state. Default value is 42.")
     parser.add_argument("--no-pca", action="store_true", help="Allows user to skip PCA and go straight to UMAP.")
     parser.add_argument("--dim-pca", type=int, default=100, help="Allows user to change PCA dim. Default is 100.")
-    return parser.parse_args()
 
+    return parser.parse_args()
 
 def load_data(file_path):
     try:
@@ -47,45 +47,7 @@ def load_data(file_path):
         raise ValueError("Input file must contain a 'text' column.")
     return df
 
-def get_param_calcs(df, verbose=False):
-    '''
-    Autocalculates UMAP and HDBSCAN parameters based off of 'text' col size.
-    '''
-    text_list = df['text'].tolist()
-    num_texts = len(text_list)
-    base_num_texts = 500
-    N = max(1, num_texts / base_num_texts)
-
-    #n_components ~ constant to N. 
-    n_components = 10
-
-    #n_neighbors ~ cube root of N. range [20, 75]
-    n_neighbors = int(min(75, max(20, 20*(N**(1/3)))))
-
-    #min_cluster_size ~ sqrt(N). range [30, 200]
-    min_cluster_size = int(min(200, max(30, 30*sqrt(N))))
-
-    #min_samples ~ log2(N). range [5, 30]
-    min_samples = int(min(30, max(5, 5*log2(N))))
-
-    params = {
-        "n_neighbors": n_neighbors,
-        "n_components": n_components,
-        "min_cluster_size": min_cluster_size,
-        "min_samples": min_samples,
-    }
-
-    if verbose:
-        print(f"[PARAM SCALING]")
-        print(f"Text count: {num_texts}")
-        print(f"UMAP n_components: {params['n_components']}")
-        print(f"UMAP n_neighbors: {params['n_neighbors']}")
-        print(f"HDBSCAN min_cluster_size: {params['min_cluster_size']}")
-        print(f"HDBSCAN min_samples: {params['min_samples']}")
-
-    return params
-
-def run_mapper(df, group_name, param_calcs, verbose, **mapper_args):
+def run_mapper(df, group_name, verbose, **mapper_args):
     '''
     Runs NarrativeMapper logic to obtain main narratives/topics and sentiments.
     '''
@@ -97,15 +59,14 @@ def run_mapper(df, group_name, param_calcs, verbose, **mapper_args):
         'random_state': mapper_args['random_state']
         }
     umap_kwargs = {
-        'n_components': param_calcs['n_components'],
-        'n_neighbors': param_calcs['n_neighbors'],
         'random_state': mapper_args['random_state'],
-        "min_dist": 0.0, 
-        "low_memory": True
+        'min_dist': 0.0, 
+        'low_memory': True,
+        'metric': 'euclidean'
         }
     hdbscan_kwargs = {
-        'min_cluster_size': param_calcs['min_cluster_size'],
-        'min_samples': param_calcs['min_samples']
+        'metric': 'euclidean',
+        'cluster_selection_method': 'eom'
     }
     
     mapper.cluster(
@@ -143,14 +104,13 @@ def main():
     try:
         args = parse_args()
         df = load_data(args.file_name)
-        param_calcs = get_param_calcs(df, verbose=args.verbose)
         mapper_args = {
             'random_state': args.random_state,
             'max_sample_size': args.max_samples,
             'no_pca': args.no_pca,
             'dim_pca': args.dim_pca
             }
-        mapper = run_mapper(df, args.online_group_name, param_calcs, verbose=args.verbose, **mapper_args)
+        mapper = run_mapper(df, args.online_group_name, verbose=args.verbose, **mapper_args)
         output = mapper.format_to_dict()["clusters"]
         write_log(output, args.online_group_name, args.file_output)
 
