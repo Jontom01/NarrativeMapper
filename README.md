@@ -392,7 +392,6 @@ min_cluster_size = int(min(200, max(20, 20*sqrt(N))))
 #min_samples ~ log2(N). range [5, 30]
 min_samples = int(min(30, max(5, 5*log2(N))))
 ```
-I also set min_dist=0.0 and low_memory=True for UMAP.
 
 ## Estimated Cost (OpenAI Pricing)
 
