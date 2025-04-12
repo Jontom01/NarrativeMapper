@@ -35,7 +35,7 @@ def get_embeddings(df, verbose=False) -> pd.DataFrame:
         text_list = df['text'].tolist()
 
         if not text_list:
-            raise RuntimeError("The 'text' column is empty after removing null values.")
+            raise RuntimeError("The 'text' column is empty.")
 
         embeddings_list = []
         batches = batch_list(text_list, model="text-embedding-3-small", max_tokens=8000) #used to send multiple requests to bypass token limit. This works because the vector space is the same each call.

@@ -112,6 +112,9 @@ Text Samples: 139
 
 ```txt
   --verbose             Print/show detailed parameter scaling info and progress bars.
+  --cache               Cache embeddings and summary pkl files to working directory.
+  --load-embeddings     Use previously embeddings pkl as file-path. Skips previous parts of the pipeline.
+  --load-summary        Use summary pkl as file-path. Skips previous parts of the pipeline.
   --file-output         Output summaries to text file in working directory.
   --max-samples         Max amount of texts samples from clusters being used in summarization. Default is 500.
   --random-state        Changes value to UMAP and PCA random state. Default value is 42.
