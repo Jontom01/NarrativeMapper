@@ -24,7 +24,7 @@ Packages it all together in clean functional, class-based, and command line inte
 
 - Uses OpenAI Embeddings: [OpenAI's text-embedding-3-small](https://platform.openai.com/docs/guides/embeddings)
 
-- Preprocessing: L2 Normalization + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (these are only used if metric is euclidean, which is the default) 
+- Preprocessing: L2 Normalization + [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html) (these are only used if UMAP + HDBSCAN similarity metric is euclidean, which is the default) 
 
 - Dimensionality reduction: [UMAP](https://umap-learn.readthedocs.io/en/latest/)
 
