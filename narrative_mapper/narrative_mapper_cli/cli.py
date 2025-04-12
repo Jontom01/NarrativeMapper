@@ -30,8 +30,8 @@ def parse_args():
     #FLAGS
     parser.add_argument("--verbose", action="store_true", help="Print/show detailed parameter scaling info and progress bars.")
     parser.add_argument("--cache", action="store_true", help="Cache embeddings and summary pkl files to working directory.")
-    parser.add_argument("--load-embeddings", action="store_true", help="Use embeddings pkl as file-path.")
-    parser.add_argument("--load-summary", action="store_true", help="Use summary pkl as file-path.")
+    parser.add_argument("--load-embeddings", action="store_true", help="Use embeddings pkl as file-path. Skips previous parts of the pipeline.")
+    parser.add_argument("--load-summary", action="store_true", help="Use summary pkl as file-path. Skips previous parts of the pipeline.")
     parser.add_argument("--file-output", action="store_true", help="Output summaries to text file in working directory.")
     parser.add_argument("--max-samples", type=int, default=500, help="Max amount of texts samples from clusters being used in summarization. Default is 500.")
     parser.add_argument("--random-state", type=int, default=42, help="Changes value to UMAP and PCA random state. Default value is 42.")

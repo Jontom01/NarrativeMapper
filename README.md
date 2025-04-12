@@ -113,14 +113,22 @@ Text Samples: 139
 ```txt
   --verbose             Print/show detailed parameter scaling info and progress bars.
   --cache               Cache embeddings and summary pkl files to working directory.
-  --load-embeddings     Use previously embeddings pkl as file-path. Skips previous parts of the pipeline.
-  --load-summary        Use summary pkl as file-path. Skips previous parts of the pipeline.
+  --load-embeddings     Use embeddings pkl as file-path (must contain mandatory cols). Skips previous parts of the pipeline.
+  --load-summary        Use summary pkl as file-path (must contain mandatory cols). Skips previous parts of the pipeline.
   --file-output         Output summaries to text file in working directory.
   --max-samples         Max amount of texts samples from clusters being used in summarization. Default is 500.
   --random-state        Changes value to UMAP and PCA random state. Default value is 42.
   --no-pca              Skip PCA and go straight to UMAP.
   --dim-pca             Change PCA dim. Default is 100.
 ```
+
+<details>
+<summary>Mandatory cols for pkl loading</summary>
+
+- --load-embeddings: Requires 'text' and 'embeddings' cols.
+
+- --load-summary: Requires  the following cols: 'text', 'cluster', 'cluster_summary', 'aggregated_sentiment'.
+</details>
 
 **Note:** Make sure you're running the CLI from the same directory where your .env file is located (Unless you have set OPENAI_API_KEY globally in your environment).
 
