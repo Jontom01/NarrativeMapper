@@ -14,6 +14,7 @@ from narrative_mapper.narrative_analyzer.embeddings import get_embeddings
 from narrative_mapper.narrative_analyzer.clustering import cluster_embeddings
 from narrative_mapper.narrative_analyzer.summarize import summarize_clusters
 from narrative_mapper.narrative_analyzer.formatters import format_to_dict
+from .cli_utils import scrape_subreddit, create_map
 from datetime import datetime
 import logging
 import argparse
@@ -25,7 +26,6 @@ def parse_args():
     #INPUT ARGUMENTS
     parser = argparse.ArgumentParser(description="Run NarrativeMapper on this file.")
     parser.add_argument("file_name", type=str, help="file path")
-    parser.add_argument("online_group_name", type=str, help="online group name")
     
     #FLAGS
     parser.add_argument("--verbose", action="store_true", help="Print/show detailed parameter scaling info and progress bars.")
@@ -37,10 +37,11 @@ def parse_args():
     parser.add_argument("--random-state", type=int, default=42, help="Changes value to UMAP and PCA random state. Default value is 42.")
     parser.add_argument("--no-pca", action="store_true", help="Allows user to skip PCA and go straight to UMAP.")
     parser.add_argument("--dim-pca", type=int, default=100, help="Allows user to change PCA dim. Default is 100.")
+    parser.add_argument("--reddit", action="store_true", help="Full reddit pipeline. Replace file-path with subreddit name.")
 
     return parser.parse_args()
 
-def load_data(file_path, load_embeddings=False, load_summary=False):
+def load_data(file_path, load_embeddings=False, load_summary=False, is_reddit_scrape=False):
     try:
         if load_embeddings: 
             df = pd.read_pickle(file_path)
@@ -52,6 +53,10 @@ def load_data(file_path, load_embeddings=False, load_summary=False):
             if not all(col in df.columns for col in ['cluster', 'cluster_summary', 'aggregated_sentiment']):
                 raise ValueError("Input file missing one of following cols: 'cluster', 'cluster_summary', 'aggregated_sentiment'.")
 
+        elif is_reddit_scrape:
+            df = scrape_subreddit([file_path],submission_limit=250, comment_limit=10)
+       
+    
         else: 
             df = pd.read_csv(file_path)
 
@@ -91,7 +96,7 @@ def run_mapper(df, group_name, verbose, **mapper_args):
             }
         hdbscan_kwargs = {
             'metric': 'euclidean',
-            'cluster_selection_method': 'eom'
+            'cluster_selection_method': 'leaf'
         }
         
         cluster_df = cluster_embeddings(
@@ -137,6 +142,7 @@ def main():
         args = parse_args()
         load_embeddings = args.load_embeddings
         load_summary = args.load_summary
+        is_reddit_scrape = args.reddit
         mapper_args = {
             'random_state': args.random_state,
             'max_sample_size': args.max_samples,
@@ -146,11 +152,15 @@ def main():
             'load_embeddings': load_embeddings,
             'load_summary': load_summary
             }
+        online_group_name = os.path.splitext(args.file_name)[0]
 
-        df = load_data(args.file_name, load_embeddings=load_embeddings, load_summary=load_summary)
-        summary_df = run_mapper(df, args.online_group_name, verbose=args.verbose, **mapper_args)
+        df = load_data(args.file_name, load_embeddings=load_embeddings, load_summary=load_summary, is_reddit_scrape=args.reddit)
+        summary_df = run_mapper(df, online_group_name, verbose=args.verbose, **mapper_args)
         output = format_to_dict(summary_df)['clusters']
-        write_log(output, args.online_group_name, args.file_output)
+        write_log(output, online_group_name, args.file_output)
+
+        map_df = pd.DataFrame(output)
+        create_map(map_df, online_group_name)
 
     except Exception as e:
         raise RuntimeError(f"Error running CLI") from e

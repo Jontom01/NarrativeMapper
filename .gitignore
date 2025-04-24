@@ -7,3 +7,4 @@ build/
 test_package.py
 dev/
 .vscode/
+narrative_mapper/narrative_mapper_cli/cli_utils.py

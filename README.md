@@ -81,7 +81,11 @@ from narrative_mapper import *
 Run NarrativeMapper directly from the terminal:
 
 ```bash
-narrativemapper path/to/your.csv online_group_name --flag-options
+narrativemapper path/to/your.csv or .pkl --flag-options
+
+or
+
+narrativemapper subreddit_name --reddit --other-flag-options
 ```
 This will:
 
@@ -97,7 +101,7 @@ This will:
 
 ```txt
 Run Timestamp: 2025-04-10 20:42:45
-Online Group Name: reddit_space_subreddit
+Online Group Name: comment_data_space
 
 Summary: The cluster addresses concerns regarding the reliability of SpaceX and Boeing in space missions, the implications of space debris on safety, and the need for corporate accountability in aerospace within the context of human exploration and technological advancement in space.
 Sentiment: NEGATIVE
@@ -113,6 +117,7 @@ Text Samples: 139
 ```txt
   --verbose             Print/show detailed parameter scaling info and progress bars.
   --cache               Cache embeddings and summary pkl files to working directory.
+  --reddit              Full reddit pipeline. Replace file-path with subreddit name.
   --load-embeddings     Use embeddings pkl as file-path (must contain mandatory cols). Skips previous parts of the pipeline.
   --load-summary        Use summary pkl as file-path (must contain mandatory cols). Skips previous parts of the pipeline.
   --file-output         Output summaries to text file in working directory.

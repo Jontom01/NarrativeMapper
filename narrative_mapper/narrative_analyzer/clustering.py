@@ -24,22 +24,22 @@ def get_param_calcs(df, umap_kwargs=None, hdbscan_kwargs=None, verbose=False):
 
     if "n_components" not in umap_kwargs: 
         #n_components ~ constant to N. 
-        n_components = 10
+        n_components = 15
         umap_kwargs['n_components'] = n_components
 
     if "n_neighbors" not in umap_kwargs:
         #n_neighbors ~ cube root of N. range [15, 75]
-        n_neighbors = int(min(75, max(15, 15*(N**(1/3)))))
+        n_neighbors = int(min(75, max(10, 10*(N**(1/3)))))
         umap_kwargs['n_neighbors'] = n_neighbors
 
     if "min_cluster_size" not in hdbscan_kwargs:
-        #min_cluster_size ~ sqrt(N). range [25, 200]
-        min_cluster_size = int(min(200, max(25, 25*sqrt(N))))
+        #min_cluster_size ~ sqrt(N). range [15, 200]
+        min_cluster_size = int(min(200, max(15, 15*sqrt(N))))
         hdbscan_kwargs['min_cluster_size'] = min_cluster_size
 
     if "min_samples" not in hdbscan_kwargs:
-        #min_samples ~ log2(N). range [5, 30]
-        min_samples = int(min(30, max(5, 5*log2(N))))
+        #min_samples ~ log2(N). range [3, 30]
+        min_samples = int(min(30, max(3, 3*log2(N))))
         hdbscan_kwargs['min_samples'] = min_samples
 
     if verbose:
