@@ -111,6 +111,9 @@ Summary: The cluster focuses on personal experiences and emotions tied to witnes
 Sentiment: NEUTRAL
 Text Samples: 139
 ---
+
+![image](https://github.com/user-attachments/assets/067fa150-5ffd-4e21-b014-8d73c7a3e24d)
+
 ```
 **Flag Options:**
 
