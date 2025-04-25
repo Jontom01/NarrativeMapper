@@ -128,7 +128,6 @@ Sentiment: NEUTRAL
 Text Samples: 47
 ---
 ```
-![image](https://github.com/user-attachments/assets/067fa150-5ffd-4e21-b014-8d73c7a3e24d)
 
 **Flag Options:**
 
