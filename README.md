@@ -100,21 +100,36 @@ This will:
 **Output example** from [this dataset](https://github.com/Jontom01/NarrativeMapper/blob/main/sample_data/comment_data/comment_data_space.csv):
 
 ```txt
-Run Timestamp: 2025-04-10 20:42:45
+Run Timestamp: 2025-04-24 17:33:07
 Online Group Name: comment_data_space
 
-Summary: The cluster addresses concerns regarding the reliability of SpaceX and Boeing in space missions, the implications of space debris on safety, and the need for corporate accountability in aerospace within the context of human exploration and technological advancement in space.
-Sentiment: NEGATIVE
-Text Samples: 244
----
-Summary: The cluster focuses on personal experiences and emotions tied to witnessing solar eclipses, encompassing travel efforts, photography techniques, and the profound awe these celestial events evoke.
+Summary: The conversation focuses on the challenges of obtaining detailed lunar imagery, doubts regarding the authenticity of moon rocks, and the optical phenomena observed during lunar observations.
 Sentiment: NEUTRAL
-Text Samples: 139
+Text Samples: 17
 ---
-
+Summary: The cluster focuses on the reliability and safety challenges of space missions involving Boeing and NASA, while exploring the philosophical implications of humanity's existence and the potential for extraterrestrial life.
+Sentiment: NEGATIVE
+Text Samples: 257
+---
+Summary: The cluster focuses on astrophysical phenomena such as supernova formation, the characteristics of planets, and the interactions of celestial bodies with the Sun and other planets.
+Sentiment: NEGATIVE
+Text Samples: 23
+---
+Summary: The cluster focuses on the observation of celestial objects, specifically star clusters and galaxies, while exploring the intricacies of astrophotography and the vastness of cosmic structures.
+Sentiment: NEUTRAL
+Text Samples: 16
+---
+Summary: The conversation cluster centers on the high quality of a photo, doubts regarding its authenticity, and an interest in acquiring photography techniques.
+Sentiment: NEUTRAL
+Text Samples: 21
+---
+Summary: This cluster focuses on the emotional impact and awe of witnessing celestial events such as eclipses and auroras, as well as the logistical challenges involved in planning travel to experience these phenomena.
+Sentiment: NEUTRAL
+Text Samples: 47
+---
+```
 ![image](https://github.com/user-attachments/assets/067fa150-5ffd-4e21-b014-8d73c7a3e24d)
 
-```
 **Flag Options:**
 
 ```txt
