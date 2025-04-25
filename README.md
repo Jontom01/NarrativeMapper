@@ -81,7 +81,7 @@ from narrative_mapper import *
 Run NarrativeMapper directly from the terminal:
 
 ```bash
-narrativemapper path/to/your.csv or .pkl --flag-options
+narrativemapper path/to/your.csv --flag-options
 
 or
 

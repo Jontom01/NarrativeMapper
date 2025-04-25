@@ -199,6 +199,6 @@ def cluster_embeddings(
     df['cluster'] = cluster_labels.tolist()
     df = df[df['cluster'] != -1] #drop noise cluster
 
-    merged_df = merge_clusters_union_find(df, threshold=0.3)  #similarity cutoff 
+    merged_df = merge_clusters_union_find(df, threshold=0.25)  #similarity cutoff 
     
     return merged_df
